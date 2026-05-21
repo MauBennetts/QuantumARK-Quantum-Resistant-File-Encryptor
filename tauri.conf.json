@@ -1,0 +1,46 @@
+{
+  "productName": "QuantumARK",
+  "version": "3.0.0",
+  "identifier": "com.quantumark.app",
+  "build": {
+    "frontendDist": "./ui"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "QuantumARK v3.0 - Post-Quantum Cryptography Suite",
+        "width": 1000,
+        "height": 720,
+        "resizable": true,
+        "transparent": false,
+        "decorations": true
+      }
+    ],
+    "security": {
+      "csp": null,
+      "capabilities": [
+        {
+          "identifier": "main-capability",
+          "description": "Permitir comandos PQC e IPC para la ventana principal",
+          "windows": ["main"],
+          "permissions": [
+            "core:default",
+            "core:event:default",
+            "core:window:default",
+            "allow-generate-keys",
+            "allow-protect-key",
+            "allow-unprotect-key",
+            "allow-encrypt-file",
+            "allow-decrypt-file"
+          ]
+        }
+      ]
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all"
+  }
+}

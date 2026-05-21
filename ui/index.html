@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuantumARK v3.0 - Post-Quantum Cryptography Suite</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Share+Tech+Mono&display=swap');
+
+    :root {
+      --bg-dark: #07070f;
+      --bg-card: rgba(13, 12, 33, 0.45);
+      --bg-card-hover: rgba(22, 19, 56, 0.6);
+      --border-color: rgba(168, 85, 247, 0.25);
+      --border-glow: rgba(168, 85, 247, 0.45);
+      --accent-purple: #a855f7;
+      --accent-purple-glow: rgba(168, 85, 247, 0.5);
+      --accent-cyan: #06b6d4;
+      --accent-cyan-glow: rgba(6, 182, 212, 0.5);
+      --accent-indigo: #4f46e5;
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --neon-green: #10b981;
+      --neon-yellow: #f59e0b;
+      --neon-red: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; -webkit-font-smoothing: antialiased; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .glow-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
+    .blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.15; animation: float 20s infinite alternate ease-in-out; }
+    .blob-purple { width: 45vw; height: 45vw; background: var(--accent-purple); top: -10%; left: -10%; animation-duration: 25s; }
+    .blob-cyan { width: 50vw; height: 50vw; background: var(--accent-cyan); bottom: -15%; right: -10%; animation-duration: 30s; }
+    .blob-indigo { width: 40vw; height: 40vw; background: var(--accent-indigo); top: 40%; left: 30%; animation-duration: 22s; }
+
+    @keyframes float {
+      0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+      100% { transform: translate(8%, 12%) scale(1.15) rotate(360deg); }
+    }
+
+    .app-container {
+      width: 100%; max-width: 1100px;
+      background: rgba(10, 8, 20, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 30px;
+      display: flex; flex-direction: column; gap: 25px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(168, 85, 247, 0.05);
+    }
+
+    .app-header { text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 20px; }
+    .logo-container { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 8px; }
+    .shield-logo { width: 55px; height: 55px; filter: drop-shadow(0 0 10px var(--accent-purple-glow)); animation: pulse-glow 3s infinite alternate ease-in-out; }
+
+    @keyframes pulse-glow {
+      0% { filter: drop-shadow(0 0 8px var(--accent-purple-glow)); }
+      100% { filter: drop-shadow(0 0 20px var(--accent-cyan-glow)); }
+    }
+
+    .logo-text h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: 1px; color: var(--text-primary); display: flex; align-items: center; gap: 2px; }
+    .logo-text h1 span { background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .version-badge { font-size: 0.75rem; padding: 3px 8px; background: rgba(168, 85, 247, 0.2); border: 1px solid var(--accent-purple); border-radius: 12px; color: #d8b4fe; font-weight: 600; margin-left: 10px; vertical-align: middle; }
+    .subtitle { color: var(--text-secondary); font-size: 0.95rem; font-weight: 300; letter-spacing: 0.5px; }
+
+    .app-nav { display: flex; gap: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 6px; }
+    .nav-tab { flex: 1; background: transparent; border: none; color: var(--text-secondary); padding: 12px 20px; font-size: 0.95rem; font-weight: 600; cursor: pointer; border-radius: 12px; display: flex; justify-content: center; align-items: center; gap: 10px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .nav-tab:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-primary); }
+    .nav-tab.active { background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(6, 182, 212, 0.2)); border: 1px solid var(--border-glow); color: var(--text-primary); box-shadow: 0 0 15px rgba(168, 85, 247, 0.15); }
+    .tab-icon { font-size: 1.1rem; }
+
+    .app-main { min-height: 400px; }
+    .tab-content { display: none; animation: fadeIn 0.4s ease-out; }
+    .tab-content.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .grid-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 768px) { .grid-layout { grid-template-columns: 1fr; } }
+
+    .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 18px; transition: all 0.3s ease; }
+    .card:hover { background: var(--bg-card-hover); border-color: rgba(168, 85, 247, 0.35); }
+    .shadow-glow { box-shadow: 0 10px 30px rgba(168, 85, 247, 0.04); }
+    .card-title { font-size: 1.15rem; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+    .accent-purple { color: var(--accent-purple); font-size: 0.8rem; text-shadow: 0 0 8px var(--accent-purple-glow); }
+    .accent-cyan { color: var(--accent-cyan); font-size: 0.8rem; text-shadow: 0 0 8px var(--accent-cyan-glow); }
+    .card-desc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; }
+
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    label { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); letter-spacing: 0.3px; }
+
+    .input-glow, .select-glow, .textarea-key, .textarea-small, .textarea-medium {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      color: var(--text-primary);
+      padding: 12px 16px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    .input-glow:focus, .select-glow:focus, .textarea-key:focus, .textarea-small:focus, .textarea-medium:focus {
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.2);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .help-text { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; }
+
+    .textarea-key { height: 120px; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; line-height: 1.4; resize: none; background: rgba(0, 0, 0, 0.2); border-color: rgba(255, 255, 255, 0.05); }
+    .textarea-small { height: 60px; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; resize: none; }
+    .textarea-medium { height: 90px; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; resize: none; }
+
+    .drop-zone { border: 2px dashed rgba(168, 85, 247, 0.3); background: rgba(168, 85, 247, 0.02); border-radius: 16px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+    .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent-cyan); background: rgba(6, 182, 212, 0.04); box-shadow: 0 0 20px rgba(6, 182, 212, 0.1); transform: translateY(-2px); }
+    .drop-icon { font-size: 2.2rem; animation: bounce 2s infinite ease-in-out; }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    .drop-text { font-size: 0.85rem; color: var(--text-secondary); }
+    .drop-file-info { display: flex; flex-direction: column; gap: 4px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 8px 16px; border-radius: 10px; max-width: 100%; }
+    .file-name { font-size: 0.85rem; font-weight: 600; color: var(--accent-cyan); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 300px; }
+    .file-size { font-size: 0.75rem; color: var(--text-muted); }
+    .hidden { display: none !important; }
+
+    .btn { border: none; color: var(--text-primary); padding: 14px 24px; font-size: 0.95rem; font-weight: 600; border-radius: 12px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent-purple), var(--accent-indigo)); box-shadow: 0 4px 15px rgba(168, 85, 247, 0.25); }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4); }
+    .btn-purple { background: linear-gradient(135deg, var(--accent-purple), #7c3aed); box-shadow: 0 4px 15px rgba(124, 58, 237, 0.25); }
+    .btn-purple:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4); }
+    .btn-cyan { background: linear-gradient(135deg, var(--accent-cyan), #0891b2); box-shadow: 0 4px 15px rgba(6, 182, 212, 0.25); }
+    .btn-cyan:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4); }
+    .btn-glow::after { content: ''; position: absolute; top: 0; left: -50%; width: 200%; height: 100%; background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.15), transparent); transform: skewX(-25deg); transition: 0.75s; }
+    .btn-glow:hover:not(:disabled)::after { left: 125%; }
+    .btn-icon { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.85rem; transition: all 0.2s ease; }
+    .btn-icon:hover { background: rgba(255, 255, 255, 0.12); transform: scale(1.05); }
+
+    .key-output-container { display: flex; flex-direction: column; gap: 15px; }
+    .key-box { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .key-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; }
+    .key-actions { display: flex; gap: 6px; }
+
+    .security-options-list { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    @media (max-width: 600px) { .security-options-list { grid-template-columns: 1fr; } }
+    .toggle-option { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.04); padding: 14px 18px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+    .col-span-2 { grid-column: span 2; }
+    @media (max-width: 600px) { .col-span-2 { grid-column: span 1; } }
+    .option-desc { display: flex; flex-direction: column; gap: 3px; }
+    .option-desc strong { font-size: 0.85rem; color: var(--text-primary); }
+    .option-desc span { font-size: 0.72rem; color: var(--text-secondary); line-height: 1.3; }
+
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.1); transition: .3s; border: 1px solid rgba(255, 255, 255, 0.08); }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; }
+    input:checked + .slider { background-color: var(--accent-purple); border-color: var(--border-glow); }
+    input:checked + .slider:before { transform: translateX(20px); }
+    .slider.round { border-radius: 34px; }
+    .slider.round:before { border-radius: 50%; }
+
+    .select-wrapper { position: relative; width: 180px; }
+    @media (max-width: 600px) { .select-wrapper { width: 100%; } }
+    .select-glow { width: 100%; padding: 10px 14px; cursor: pointer; border-radius: 10px; appearance: none; background: rgba(255, 255, 255, 0.04); }
+    .select-glow option { background-color: var(--bg-dark); color: var(--text-primary); padding: 10px; }
+
+    .app-terminal { background: rgba(5, 4, 12, 0.95); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; overflow: hidden; box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9); }
+    .terminal-header { background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid rgba(255, 255, 255, 0.06); padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; }
+    .terminal-title { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: var(--text-secondary); letter-spacing: 0.5px; }
+    .btn-clear { background: transparent; border: none; color: var(--text-muted); font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; cursor: pointer; transition: color 0.2s ease; }
+    .btn-clear:hover { color: var(--text-primary); }
+    .terminal-body { height: 120px; padding: 12px 16px; overflow-y: auto; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; display: flex; flex-direction: column; gap: 6px; line-height: 1.4; }
+    .log-line { word-break: break-all; }
+    .text-green { color: var(--neon-green); text-shadow: 0 0 5px rgba(16, 185, 129, 0.3); }
+    .text-cyan { color: var(--accent-cyan); text-shadow: 0 0 5px rgba(6, 182, 212, 0.3); }
+    .text-yellow { color: var(--neon-yellow); text-shadow: 0 0 5px rgba(245, 158, 11, 0.3); }
+    .text-red { color: var(--neon-red); text-shadow: 0 0 5px rgba(239, 68, 68, 0.3); }
+    .text-white { color: var(--text-primary); }
+    .loader { border: 2px solid rgba(255, 255, 255, 0.2); border-top: 2px solid var(--text-primary); border-radius: 50%; width: 18px; height: 18px; animation: spin 0.8s linear infinite; display: inline-block; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .glass-card {}
+  </style>
+</head>
+<body>
+  <div class="glow-bg">
+    <div class="blob blob-purple"></div>
+    <div class="blob blob-cyan"></div>
+    <div class="blob blob-indigo"></div>
+  </div>
+
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo-container">
+        <svg class="shield-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 5L15 20V50C15 72 35 90 50 95C65 90 85 72 85 50V20L50 5Z" fill="url(#shield-grad)" stroke="url(#stroke-grad)" stroke-width="2"/>
+          <path d="M50 25C40 25 32 33 32 43C32 50 36 56 42 59V75H58V59C64 56 68 50 68 43C68 33 60 25 50 25ZM50 51C45.5 51 42 47.5 42 43C42 38.5 45.5 35 50 35C54.5 35 58 38.5 58 43C58 47.5 54.5 51 50 51Z" fill="#a855f7"/>
+          <defs>
+            <radialGradient id="shield-grad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#1e1b4b" stop-opacity="0.8"/>
+              <stop offset="100%" stop-color="#0f0f17" stop-opacity="0.95"/>
+            </radialGradient>
+            <linearGradient id="stroke-grad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#a855f7"/>
+              <stop offset="100%" stop-color="#06b6d4"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="logo-text">
+          <h1>Quantum<span>ARK</span></h1>
+          <span class="version-badge">v3.0 PQC</span>
+        </div>
+      </div>
+      <p class="subtitle">Suite Avanzada de Criptografía Post-Cuántica e Integridad Militar</p>
+    </header>
+
+    <nav class="app-nav">
+      <button class="nav-tab active" data-tab="tab-keys" id="nav-keys">
+        <span class="tab-icon">🔑</span>
+        <span class="tab-label">Gestión de Llaves</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-encrypt" id="nav-encrypt">
+        <span class="tab-icon">🔒</span>
+        <span class="tab-label">Cifrado Seguro</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-decrypt" id="nav-decrypt">
+        <span class="tab-icon">🔓</span>
+        <span class="tab-label">Descifrado</span>
+      </button>
+    </nav>
+
+    <main class="app-main">
+
+      <!-- PESTAÑA: GESTIÓN DE LLAVES -->
+      <section id="tab-keys" class="tab-content active">
+        <div class="grid-layout">
+          <div class="card glass-card shadow-glow">
+            <h3 class="card-title"><span class="accent-purple">●</span> Generación de Identidad PQC</h3>
+            <p class="card-desc">Crea un par de llaves criptográficas basadas en algoritmos protegidos contra ordenadores cuánticos: <strong>Kyber-1024</strong> (KEM) y <strong>Dilithium-5</strong> (Firmas).</p>
+            <div class="form-group">
+              <label for="key-pwd">Contraseña de Protección (Opcional)</label>
+              <input type="password" id="key-pwd" placeholder="Clave para encriptar la llave privada con Argon2id..." class="input-glow">
+              <small class="help-text">Si ingresas una contraseña, tu llave privada se guardará cifrada con ChaCha20-Poly1305 para evitar robo físico.</small>
+            </div>
+            <button id="btn-generate-keys" class="btn btn-primary btn-glow">
+              <span class="btn-text">Generar Nuevas Llaves PQC</span>
+              <span class="loader hidden"></span>
+            </button>
+          </div>
+
+          <div class="card glass-card">
+            <h3 class="card-title"><span class="accent-cyan">●</span> Llaves Criptográficas Activas</h3>
+            <div class="key-output-container">
+              <div class="key-box">
+                <div class="key-header">
+                  <span>Clave Pública (Kyber1024 + Dilithium5)</span>
+                  <div class="key-actions">
+                    <button class="btn-icon" id="btn-copy-pub" title="Copiar al portapapeles">📋</button>
+                    <button class="btn-icon" id="btn-save-pub" title="Guardar como archivo">💾</button>
+                  </div>
+                </div>
+                <textarea id="pub-key-display" readonly placeholder="No hay ninguna llave pública activa en memoria..." class="textarea-key"></textarea>
+              </div>
+              <div class="key-box">
+                <div class="key-header">
+                  <span>Clave Privada (Protegida)</span>
+                  <div class="key-actions">
+                    <button class="btn-icon" id="btn-copy-priv" title="Copiar al portapapeles">📋</button>
+                    <button class="btn-icon" id="btn-save-priv" title="Guardar como archivo">💾</button>
+                  </div>
+                </div>
+                <textarea id="priv-key-display" readonly placeholder="No hay ninguna llave privada activa en memoria..." class="textarea-key"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PESTAÑA: CIFRADO -->
+      <section id="tab-encrypt" class="tab-content">
+        <div class="grid-layout">
+          <div class="card glass-card">
+            <h3 class="card-title"><span class="accent-purple">●</span> Archivo a Cifrar</h3>
+            <div class="drop-zone" id="encrypt-drop-zone">
+              <div class="drop-icon">📂</div>
+              <div class="drop-text">Arrastra y suelta tu archivo aquí o ingresa la ruta</div>
+              <div class="drop-file-info hidden" id="encrypt-file-info">
+                <span class="file-name" id="enc-filename">archivo.dat</span>
+                <span class="file-size" id="enc-filesize">0 KB</span>
+              </div>
+            </div>
+            <div class="form-group" style="margin-top: 5px;">
+              <label for="encrypt-input-path">Ruta del Archivo Original</label>
+              <input type="text" id="encrypt-input-path" placeholder="/Users/tu-usuario/documento.pdf" class="input-glow">
+            </div>
+            <div class="form-group">
+              <label for="encrypt-pwd">Contraseña Adicional (Doble Factor)</label>
+              <input type="password" id="encrypt-pwd" placeholder="Contraseña secreta adicional..." class="input-glow">
+              <small class="help-text">Mezcla esta contraseña con Kyber usando Argon2id para un cifrado impenetrable.</small>
+            </div>
+          </div>
+
+          <div class="card glass-card shadow-glow">
+            <h3 class="card-title"><span class="accent-cyan">●</span> Blindaje y Seguridad Militar</h3>
+            <div class="form-group">
+              <label for="recipient-pubkey">Clave Pública del Receptor (Destinatario)</label>
+              <textarea id="recipient-pubkey" placeholder="Pega el JSON de la llave pública del destinatario aquí..." class="textarea-small input-glow"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="sender-privkey">Tu Clave Privada (Emisor - para Firma)</label>
+              <textarea id="sender-privkey" placeholder="Pega tu clave privada JSON para firmar digitalmente con Dilithium-5..." class="textarea-small input-glow"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="sender-key-pwd">Contraseña de tu Clave Privada (Si está protegida)</label>
+              <input type="password" id="sender-key-pwd" placeholder="Contraseña para desbloquear tu clave privada..." class="input-glow">
+            </div>
+            <div class="security-options-list">
+              <div class="toggle-option">
+                <div class="option-desc">
+                  <strong>Eliminación de Metadatos</strong>
+                  <span>Limpia EXIF, GPS, cámara y autor de imágenes.</span>
+                </div>
+                <label class="switch"><input type="checkbox" id="chk-metadata-clean" checked><span class="slider round"></span></label>
+              </div>
+              <div class="toggle-option">
+                <div class="option-desc">
+                  <strong>Ofuscación de Tamaño</strong>
+                  <span>Agrega ruido criptográfico (bloques 64KB).</span>
+                </div>
+                <label class="switch"><input type="checkbox" id="chk-padding-obfuscation" checked><span class="slider round"></span></label>
+              </div>
+              <div class="toggle-option col-span-2">
+                <div class="option-desc">
+                  <strong>Destrucción Segura del Original (Shredder)</strong>
+                  <span>Sobrescribe el archivo original en disco antes de borrarlo.</span>
+                </div>
+                <div class="select-wrapper">
+                  <select id="sel-shred-passes" class="select-glow">
+                    <option value="0">No borrar archivo original</option>
+                    <option value="1">1 pase (Sobrescritura rápida)</option>
+                    <option value="3" selected>3 pases (Estándar corporativo)</option>
+                    <option value="7">7 pases (Nivel Militar DoD)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <button id="btn-encrypt-file" class="btn btn-glow btn-purple" style="width: 100%;">
+              <span class="btn-text">Cifrar y Blindar Archivo (.qarq)</span>
+              <span class="loader hidden"></span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- PESTAÑA: DESCIFRADO -->
+      <section id="tab-decrypt" class="tab-content">
+        <div class="grid-layout">
+          <div class="card glass-card shadow-glow">
+            <h3 class="card-title"><span class="accent-purple">●</span> Archivo Blindado</h3>
+            <div class="drop-zone" id="decrypt-drop-zone">
+              <div class="drop-icon">🔒</div>
+              <div class="drop-text">Arrastra y suelta tu archivo .qarq aquí o ingresa la ruta</div>
+              <div class="drop-file-info hidden" id="decrypt-file-info">
+                <span class="file-name" id="dec-filename-info">archivo.qarq</span>
+                <span class="file-size" id="dec-filesize-info">0 KB</span>
+              </div>
+            </div>
+            <div class="form-group" style="margin-top: 5px;">
+              <label for="decrypt-input-path">Ruta del Archivo Cifrado (.qarq)</label>
+              <input type="text" id="decrypt-input-path" placeholder="/Users/tu-usuario/archivo.qarq" class="input-glow">
+            </div>
+            <div class="form-group">
+              <label for="decrypt-pwd">Contraseña de Doble Factor (Si aplica)</label>
+              <input type="password" id="decrypt-pwd" placeholder="Contraseña de descifrado..." class="input-glow">
+            </div>
+          </div>
+
+          <div class="card glass-card">
+            <h3 class="card-title"><span class="accent-cyan">●</span> Autenticación y Desencapsulación</h3>
+            <div class="form-group">
+              <label for="recipient-privkey-dec">Tu Clave Privada (Receptor - para Desencapsular)</label>
+              <textarea id="recipient-privkey-dec" placeholder="Pega tu clave privada JSON para descifrar el secreto Kyber..." class="textarea-medium input-glow"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="recipient-privkey-dec-pwd">Contraseña de tu Clave Privada (Si está protegida)</label>
+              <input type="password" id="recipient-privkey-dec-pwd" placeholder="Contraseña para desbloquear tu clave privada..." class="input-glow">
+            </div>
+            <div class="form-group">
+              <label for="sender-pubkey-dec">Clave Pública del Remitente (para Verificar Firma)</label>
+              <textarea id="sender-pubkey-dec" placeholder="Pega la clave pública JSON del remitente para verificar su firma Dilithium-5..." class="textarea-medium input-glow"></textarea>
+            </div>
+            <button id="btn-decrypt-file" class="btn btn-glow btn-cyan" style="width: 100%;">
+              <span class="btn-text">Descifrar y Restaurar Archivo</span>
+              <span class="loader hidden"></span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="app-terminal">
+      <div class="terminal-header">
+        <span class="terminal-title">🖥️ Consola Cuántica de Operaciones</span>
+        <button id="btn-clear-terminal" class="btn-clear">Limpiar</button>
+      </div>
+      <div class="terminal-body" id="terminal-output">
+        <div class="log-line text-green">[SISTEMA] QuantumARK v3.0 inicializado. Soporte PQC activo.</div>
+        <div class="log-line text-cyan">[SISTEMA] Kyber-1024 (KEM) + Dilithium-5 (Firma) listos.</div>
+        <div class="log-line text-yellow">[AVISO] Todas las operaciones se realizan localmente. Cero telemetría.</div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+  // ============================================================
+  //   QuantumARK v3.0 — Controller (Inlined)
+  // ============================================================
+  (function() {
+    'use strict';
+
+    // ── Utilidades ──────────────────────────────────────────
+    var terminal = document.getElementById('terminal-output');
+
+    function log(color, message) {
+      var line = document.createElement('div');
+      line.className = 'log-line text-' + color;
+      var t = new Date().toLocaleTimeString();
+      line.textContent = '[' + t + '] ' + message;
+      terminal.appendChild(line);
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function formatBytes(bytes, dec) {
+      dec = dec == null ? 2 : dec;
+      if (!bytes || bytes === 0) return '0 Bytes';
+      var k = 1024, sizes = ['Bytes','KB','MB','GB','TB'];
+      var i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dec)) + ' ' + sizes[i];
+    }
+
+    // ── Tauri invoke setup ───────────────────────────────────
+    var invoke = null;
+    var listen = null;
+
+    function waitForTauri(attempts, cb) {
+      attempts = attempts || 0;
+      var t = window.__TAURI__;
+      if (t) {
+        try {
+          if (t.core && typeof t.core.invoke === 'function') { invoke = t.core.invoke.bind(t.core); }
+          else if (typeof t.invoke === 'function') { invoke = t.invoke.bind(t); }
+          if (t.event && typeof t.event.listen === 'function') { listen = t.event.listen.bind(t.event); }
+          else if (typeof t.listen === 'function') { listen = t.listen.bind(t); }
+        } catch(e) { log('red', '[ERROR] Al inicializar API Tauri: ' + e); }
+      }
+
+      if (invoke) {
+        log('green', '[INICIO] Conexión nativa con Tauri establecida ✓');
+        cb();
+      } else if (attempts < 30) {
+        setTimeout(function() { waitForTauri(attempts + 1, cb); }, 100);
+      } else {
+        log('red', '[ERROR] API de Tauri no disponible. Verifica que la app esté compilada correctamente.');
+        log('yellow', '[INFO] Funcionalidad limitada — solo interfaz visual activa.');
+        cb();
+      }
+    }
+
+    // ── Tabs / Navegación ────────────────────────────────────
+    function setupTabs() {
+      var tabs = document.querySelectorAll('.nav-tab');
+      var sections = document.querySelectorAll('.tab-content');
+
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          var target = tab.getAttribute('data-tab');
+          tabs.forEach(function(t) { t.classList.remove('active'); });
+          sections.forEach(function(s) { s.classList.remove('active'); });
+          tab.classList.add('active');
+          var sec = document.getElementById(target);
+          if (sec) { sec.classList.add('active'); }
+          var label = tab.querySelector('.tab-label');
+          log('cyan', '[VISTA] → ' + (label ? label.textContent : target));
+        });
+      });
+    }
+
+    // ── Limpiar consola ──────────────────────────────────────
+    function setupClearBtn() {
+      var btn = document.getElementById('btn-clear-terminal');
+      if (btn) {
+        btn.addEventListener('click', function() {
+          terminal.innerHTML = '';
+          log('green', '[SISTEMA] Consola reiniciada.');
+        });
+      }
+    }
+
+    // ── Drag & Drop ──────────────────────────────────────────
+    function setupDropZones() {
+      var encZone = document.getElementById('encrypt-drop-zone');
+      var decZone = document.getElementById('decrypt-drop-zone');
+      var encPath = document.getElementById('encrypt-input-path');
+      var decPath = document.getElementById('decrypt-input-path');
+      var encInfo = document.getElementById('encrypt-file-info');
+      var decInfo = document.getElementById('decrypt-file-info');
+
+      function bindZone(zone, pathInput, infoEl, nameEl, sizeEl) {
+        zone.addEventListener('dragover', function(e) { e.preventDefault(); zone.classList.add('dragover'); });
+        zone.addEventListener('dragleave', function() { zone.classList.remove('dragover'); });
+        zone.addEventListener('drop', function(e) {
+          e.preventDefault();
+          zone.classList.remove('dragover');
+          var files = e.dataTransfer.files;
+          if (files && files.length > 0) {
+            var f = files[0];
+            log('yellow', '[DRAG] Archivo: ' + f.name + ' (' + formatBytes(f.size) + ')');
+            document.getElementById(nameEl).textContent = f.name;
+            document.getElementById(sizeEl).textContent = formatBytes(f.size);
+            infoEl.classList.remove('hidden');
+          }
+        });
+      }
+
+      bindZone(encZone, encPath, encInfo, 'enc-filename', 'enc-filesize');
+      bindZone(decZone, decPath, decInfo, 'dec-filename-info', 'dec-filesize-info');
+
+      // Tauri native drag-drop
+      if (listen) {
+        listen('tauri://drag-drop', function(event) {
+          var paths = (event.payload && Array.isArray(event.payload.paths)) ? event.payload.paths : (Array.isArray(event.payload) ? event.payload : []);
+          if (paths.length > 0) {
+            var p = paths[0];
+            var name = p.split('/').pop() || p;
+            var activeTab = (document.querySelector('.nav-tab.active') || {}).getAttribute('data-tab');
+            log('green', '[DRAG-DROP] Archivo nativo: ' + p);
+            if (activeTab === 'tab-encrypt') {
+              document.getElementById('encrypt-input-path').value = p;
+              document.getElementById('enc-filename').textContent = name;
+              document.getElementById('enc-filesize').textContent = 'Ruta detectada';
+              document.getElementById('encrypt-file-info').classList.remove('hidden');
+            } else if (activeTab === 'tab-decrypt') {
+              document.getElementById('decrypt-input-path').value = p;
+              document.getElementById('dec-filename-info').textContent = name;
+              document.getElementById('dec-filesize-info').textContent = 'Ruta detectada';
+              document.getElementById('decrypt-file-info').classList.remove('hidden');
+            }
+          }
+        }).catch(function() {});
+      }
+    }
+
+    // ── Portapapeles / Descarga ──────────────────────────────
+    function setupClipboard(btnId, textareaId, keyName) {
+      var btn = document.getElementById(btnId);
+      var ta = document.getElementById(textareaId);
+      if (!btn || !ta) return;
+      btn.addEventListener('click', function() {
+        if (!ta.value) { log('yellow', '[AVISO] No hay ' + keyName + ' para copiar.'); return; }
+        navigator.clipboard.writeText(ta.value).then(function() {
+          log('green', '[OK] ' + keyName + ' copiada al portapapeles.');
+          btn.textContent = '✅';
+          setTimeout(function() { btn.textContent = '📋'; }, 1500);
+        }).catch(function(e) { log('red', '[ERROR] Portapapeles: ' + e); });
+      });
+    }
+
+    function setupDownload(btnId, textareaId, filename) {
+      var btn = document.getElementById(btnId);
+      var ta = document.getElementById(textareaId);
+      if (!btn || !ta) return;
+      btn.addEventListener('click', function() {
+        if (!ta.value) { log('yellow', '[AVISO] No hay contenido para descargar.'); return; }
+        var a = document.createElement('a');
+        a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(ta.value);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        log('green', '[OK] Archivo guardado: ' + filename);
+      });
+    }
+
+    // ── Generar Llaves ───────────────────────────────────────
+    function setupGenerateKeys() {
+      var btn = document.getElementById('btn-generate-keys');
+      if (!btn) return;
+      btn.addEventListener('click', function() {
+        if (!invoke) {
+          log('red', '[ERROR] Tauri no disponible. La app debe ejecutarse como binario nativo, no en navegador.');
+          return;
+        }
+
+        var pwd = document.getElementById('key-pwd').value;
+        var loader = btn.querySelector('.loader');
+        var btnText = btn.querySelector('.btn-text');
+        loader.classList.remove('hidden');
+        btnText.textContent = 'Generando...';
+        btn.disabled = true;
+
+        log('cyan', '[PROCESO] Generando par Kyber-1024 + Dilithium-5 con OsRng...');
+
+        invoke('generate_keys').then(function(keys) {
+          var pubKeyJson = keys[0];
+          var privKeyJson = keys[1];
+          log('green', '[OK] Par de llaves cuánticas generado exitosamente.');
+          log('cyan', '[CRYPTO] Kyber-1024 KEM + Dilithium-5 DSA activos.');
+
+          document.getElementById('pub-key-display').value = pubKeyJson;
+
+          if (pwd && pwd.trim().length > 0) {
+            log('cyan', '[PROCESO] Cifrando clave privada con Argon2id + ChaCha20-Poly1305...');
+            invoke('protect_key', { privateKeyJson: privKeyJson, password: pwd }).then(function(hexProtected) {
+              var protectedObj = {
+                protected_data_hex: hexProtected,
+                argon2id_salt_size: 32,
+                chacha20_nonce_size: 12,
+                is_protected: true,
+                algorithm: 'Argon2id-ChaCha20Poly1305'
+              };
+              document.getElementById('priv-key-display').value = JSON.stringify(protectedObj, null, 2);
+              log('green', '[OK] Clave privada protegida con contraseña.');
+            }).catch(function(e) {
+              log('red', '[ERROR] Al proteger la clave: ' + e);
+              document.getElementById('priv-key-display').value = privKeyJson;
+            }).finally(function() {
+              loader.classList.add('hidden');
+              btnText.textContent = 'Generar Nuevas Llaves PQC';
+              btn.disabled = false;
+            });
+          } else {
+            document.getElementById('priv-key-display').value = privKeyJson;
+            log('yellow', '[AVISO] Clave privada en texto plano (sin contraseña de protección).');
+            loader.classList.add('hidden');
+            btnText.textContent = 'Generar Nuevas Llaves PQC';
+            btn.disabled = false;
+          }
+        }).catch(function(e) {
+          log('red', '[ERROR] Al generar llaves: ' + e);
+          loader.classList.add('hidden');
+          btnText.textContent = 'Generar Nuevas Llaves PQC';
+          btn.disabled = false;
+        });
+      });
+    }
+
+    // ── Cifrar Archivo ───────────────────────────────────────
+    function setupEncrypt() {
+      var btn = document.getElementById('btn-encrypt-file');
+      if (!btn) return;
+      btn.addEventListener('click', function() {
+        if (!invoke) { log('red', '[ERROR] Tauri no disponible.'); return; }
+
+        var inputPath = document.getElementById('encrypt-input-path').value.trim();
+        var pubKey = document.getElementById('recipient-pubkey').value.trim();
+        var privKey = document.getElementById('sender-privkey').value.trim();
+        var senderKeyPwd = document.getElementById('sender-key-pwd').value;
+        var doubleFactorPwd = document.getElementById('encrypt-pwd').value;
+        var cleanMetadata = document.getElementById('chk-metadata-clean').checked;
+        var sizeObfuscation = document.getElementById('chk-padding-obfuscation').checked;
+        var shredPasses = parseInt(document.getElementById('sel-shred-passes').value);
+
+        if (!inputPath) { log('red', '[ERROR] Especifica la ruta del archivo a cifrar.'); return; }
+        if (!pubKey) { log('red', '[ERROR] Se requiere la clave pública del receptor.'); return; }
+        if (!privKey) { log('red', '[ERROR] Se requiere tu clave privada (emisor) para firmar.'); return; }
+
+        var loader = btn.querySelector('.loader');
+        var btnText = btn.querySelector('.btn-text');
+        loader.classList.remove('hidden');
+        btnText.textContent = 'Cifrando...';
+        btn.disabled = true;
+
+        log('cyan', '[PROCESO] Iniciando cifrado: ' + inputPath);
+
+        var doEncrypt = function(senderPrivKeyFinal) {
+          log('cyan', '[CRYPTO] Kyber-1024 KEM + ChaCha20-Poly1305 + Dilithium-5...');
+          invoke('encrypt_file', {
+            inputPath: inputPath,
+            publicKeyJson: pubKey,
+            senderPrivateKeyJson: senderPrivKeyFinal,
+            password: doubleFactorPwd || null,
+            deleteOriginal: shredPasses > 0,
+            shredPasses: shredPasses,
+            metadataClean: cleanMetadata
+          }).then(function(outPath) {
+            log('green', '[ÉXITO] Archivo cifrado: ' + outPath);
+            if (shredPasses > 0) log('green', '[SHRED] Original destruido de forma segura.');
+          }).catch(function(e) {
+            log('red', '[ERROR] Cifrado fallido: ' + e);
+          }).finally(function() {
+            loader.classList.add('hidden');
+            btnText.textContent = 'Cifrar y Blindar Archivo (.qarq)';
+            btn.disabled = false;
+          });
+        };
+
+        if (privKey.includes('protected_data_hex')) {
+          if (!senderKeyPwd) {
+            log('red', '[ERROR] Tu clave privada está protegida. Ingresa la contraseña.');
+            loader.classList.add('hidden'); btnText.textContent = 'Cifrar y Blindar Archivo (.qarq)'; btn.disabled = false;
+            return;
+          }
+          var keyObj = JSON.parse(privKey);
+          invoke('unprotect_key', { protectedKeyHex: keyObj.protected_data_hex, password: senderKeyPwd }).then(function(decryptedKey) {
+            log('green', '[OK] Clave privada desbloqueada.');
+            doEncrypt(decryptedKey);
+          }).catch(function(e) {
+            log('red', '[ERROR] Al desbloquear clave: ' + e);
+            loader.classList.add('hidden'); btnText.textContent = 'Cifrar y Blindar Archivo (.qarq)'; btn.disabled = false;
+          });
+        } else {
+          doEncrypt(privKey);
+        }
+      });
+    }
+
+    // ── Descifrar Archivo ────────────────────────────────────
+    function setupDecrypt() {
+      var btn = document.getElementById('btn-decrypt-file');
+      if (!btn) return;
+      btn.addEventListener('click', function() {
+        if (!invoke) { log('red', '[ERROR] Tauri no disponible.'); return; }
+
+        var inputPath = document.getElementById('decrypt-input-path').value.trim();
+        var recipientPrivKey = document.getElementById('recipient-privkey-dec').value.trim();
+        var recipientPrivKeyPwd = document.getElementById('recipient-privkey-dec-pwd').value;
+        var senderPubKey = document.getElementById('sender-pubkey-dec').value.trim();
+        var doubleFactorPwd = document.getElementById('decrypt-pwd').value;
+
+        if (!inputPath) { log('red', '[ERROR] Especifica la ruta del archivo .qarq.'); return; }
+        if (!recipientPrivKey) { log('red', '[ERROR] Se requiere tu clave privada para descifrar.'); return; }
+        if (!senderPubKey) { log('red', '[ERROR] Se requiere la clave pública del remitente para verificar.'); return; }
+
+        var loader = btn.querySelector('.loader');
+        var btnText = btn.querySelector('.btn-text');
+        loader.classList.remove('hidden');
+        btnText.textContent = 'Descifrando...';
+        btn.disabled = true;
+
+        log('cyan', '[PROCESO] Descifrado: ' + inputPath);
+
+        var doDecrypt = function(privKeyFinal) {
+          invoke('decrypt_file', {
+            inputPath: inputPath,
+            recipientPrivateKeyJson: privKeyFinal,
+            senderPublicKeyJson: senderPubKey,
+            password: doubleFactorPwd || null
+          }).then(function(outPath) {
+            log('green', '[ÉXITO] Firma Dilithium-5 verificada ✓');
+            log('green', '[ÉXITO] Archivo restaurado: ' + outPath);
+          }).catch(function(e) {
+            log('red', '[ERROR] Descifrado fallido: ' + e);
+          }).finally(function() {
+            loader.classList.add('hidden');
+            btnText.textContent = 'Descifrar y Restaurar Archivo';
+            btn.disabled = false;
+          });
+        };
+
+        if (recipientPrivKey.includes('protected_data_hex')) {
+          if (!recipientPrivKeyPwd) {
+            log('red', '[ERROR] Tu clave privada está protegida. Ingresa la contraseña.');
+            loader.classList.add('hidden'); btnText.textContent = 'Descifrar y Restaurar Archivo'; btn.disabled = false;
+            return;
+          }
+          var keyObj = JSON.parse(recipientPrivKey);
+          invoke('unprotect_key', { protectedKeyHex: keyObj.protected_data_hex, password: recipientPrivKeyPwd }).then(function(dk) {
+            doDecrypt(dk);
+          }).catch(function(e) {
+            log('red', '[ERROR] Al desbloquear clave: ' + e);
+            loader.classList.add('hidden'); btnText.textContent = 'Descifrar y Restaurar Archivo'; btn.disabled = false;
+          });
+        } else {
+          doDecrypt(recipientPrivKey);
+        }
+      });
+    }
+
+    // ── Inicializar todo ─────────────────────────────────────
+    setupTabs();
+    setupClearBtn();
+
+    waitForTauri(0, function() {
+      setupDropZones();
+      setupClipboard('btn-copy-pub', 'pub-key-display', 'Clave Pública');
+      setupClipboard('btn-copy-priv', 'priv-key-display', 'Clave Privada');
+      setupDownload('btn-save-pub', 'pub-key-display', 'quantum_identity.pub');
+      setupDownload('btn-save-priv', 'priv-key-display', 'quantum_identity.key');
+      setupGenerateKeys();
+      setupEncrypt();
+      setupDecrypt();
+    });
+
+  })();
+  </script>
+</body>
+</html>

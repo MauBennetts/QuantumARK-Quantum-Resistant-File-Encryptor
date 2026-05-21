@@ -1,525 +1,326 @@
-# ⚛️ QuantumARK v2.0 - True Post-Quantum Cryptography File Encryptor
+# QuantumARK v3.0 — Post-Quantum Cryptography Suite
 
-<div align="center">
-
-*Sorry for any mistakes, still learning every day! | ¡Perdón por los errores, sigo aprendiendo día a día!* 😊
-
-**🛡️ Security Status: Code continuously monitored and audited by Bandit & Semgrep for maximum security**
-
-![QuantumARK Logo](https://img.shields.io/badge/QuantumARK-v2.0.0-purple?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K)
-
-**🚀 PRIMER CIFRADOR DE ARCHIVOS CON ALGORITMOS NIST POST-QUANTUM REALES**  
-*Protección garantizada contra computadoras cuánticas*
-
-[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
-[![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)]()
-[![PQC Ready](https://img.shields.io/badge/PQC-NIST%20Approved-green.svg)]()
-
-[🚀 Descarga](#descarga) • [⚛️ Algoritmos PQC](#algoritmos-post-cuánticos) • [🛡️ Seguridad](#análisis-de-seguridad)
-
-</div>
+> **Suite de criptografía post-cuántica de grado militar.** Protege tus archivos contra ordenadores cuánticos y adversarios avanzados mediante los algoritmos oficiales del NIST para la era post-cuántica.
 
 ---
 
-## 🌟 ¿Qué es QuantumARK v2.0?
-
-**QuantumARK v2.0** es el **primer cifrador de archivos del mundo** que implementa los **estándares NIST Post-Quantum Cryptography** de forma completa y práctica. Diseñado para proteger tus datos contra las amenazas actuales y las futuras computadoras cuánticas.
-
-### 🎯 **NUEVO en v2.0: ¡Verdadera Resistencia Cuántica!**
-
-- ✅ **CRYSTALS-Kyber1024** - Intercambio de claves resistente al algoritmo de Shor
-- ✅ **CRYSTALS-Dilithium5** - Firmas digitales post-cuánticas
-- ✅ **ChaCha20-Poly1305** - Cifrado simétrico resistente a ataques cuánticos
-- ✅ **Eliminación completa de RSA** - No más vulnerabilidades a Shor
-- ✅ **Firma DESPUÉS del cifrado** - Flujo de seguridad corregido
-
-### ✨ Características Principales
-
-| ⚛️ **Post-Quantum Cryptography** | 🎨 **Interfaz Avanzada** | 🔧 **Gestión de Claves** |
-|:---:|:---:|:---:|
-| Algoritmos NIST PQC certificados | GUI rediseñada con 4 pestañas | Generación de claves PQC integrada |
-| Kyber1024 + Dilithium5 + ChaCha20 | Validación estricta de contraseñas | Protección obligatoria con contraseña |
-| Resistente a Shor y Grover | Indicador de fortaleza avanzado | Gestión segura de claves públicas/privadas |
-
-| 🛡️ **Seguridad Mejorada** | 🌍 **Multiplataforma** | 🔒 **Privacidad Total** |
-|:---:|:---:|:---:|
-| HKDF-SHA3-256 para derivación | Windows, macOS, Linux | Sin telemetría ni conexiones |
-| Verificación de integridad SHA3-256 | Executable único disponible | Datos 100% locales |
-| Metadatos cifrados y autenticados | Código fuente abierto | Zero-knowledge arquitectura |
-
----
-
-## ⚛️ Algoritmos Post-Cuánticos
-
-### 🔬 **Implementación NIST PQC**
-
-QuantumARK v2.0 es el **primer software civil** que implementa completamente:
+## 📁 Estructura del Proyecto
 
 ```
-🏆 CRYSTALS-Kyber1024 (NIST PQC Standard)
-├── 🎯 Key Encapsulation Mechanism (KEM)
-├── 🛡️ Basado en Module Learning With Errors (MLWE)
-├── 🔐 Claves públicas: 1,568 bytes
-├── 🗝️ Claves privadas: 3,168 bytes
-└── ⚡ Resistente al algoritmo de Shor
-
-🏆 CRYSTALS-Dilithium5 (NIST PQC Standard)  
-├── ✍️ Digital Signature Algorithm
-├── 🛡️ Basado en Module Short Integer Solution (MSIS)
-├── 📝 Firmas: 4,595 bytes
-├── 🔏 Nivel de seguridad: NIST Level 5
-└── ⚛️ Quantum-safe signatures
-
-🏆 ChaCha20-Poly1305 (Symmetric Encryption)
-├── 🔄 Stream cipher resistente a ataques cuánticos
-├── 🔐 Autenticación integrada (AEAD)
-├── ⚡ Optimizado para software
-└── 🛡️ Inmune a ataques de tiempo
-```
-
-### 🆚 **Comparación de Seguridad Cuántica**
-
-| Algoritmo | Vulnerabilidad Shor | Vulnerabilidad Grover | QuantumARK v2.0 |
-|-----------|-------------------|---------------------|-----------------|
-| **RSA-4096** | ❌ **Completamente vulnerable** | ❌ Vulnerable | ✅ **Eliminado** |
-| **ECDSA** | ❌ **Completamente vulnerable** | ❌ Vulnerable | ✅ **Eliminado** |
-| **AES-256** | ✅ Resistente | ⚠️ **128 bits efectivos** | ✅ **Mejorado con ChaCha20** |
-| **SHA-256** | ✅ Resistente | ⚠️ **128 bits efectivos** | ✅ **Reforzado con SHA3-256** |
-| **Kyber1024** | ✅ **Diseñado para resistir** | ✅ **Resistente** | ✅ **Implementado** |
-| **Dilithium5** | ✅ **Diseñado para resistir** | ✅ **Resistente** | ✅ **Implementado** |
-
----
-
-## 🚀 Descarga e Instalación
-
-### 📦 **Versión Ejecutable (Recomendada)**
-```
-🪟 Windows: QuantumARK-v2.0.0-windows.exe (45 MB)
-🍎 macOS: QuantumARK-v2.0.0-macos.dmg (48 MB)  
-🐧 Linux: QuantumARK-v2.0.0-linux.AppImage (52 MB)
-```
-
-### 🐍 **Desde Código Fuente**
-```bash
-# Clonar repositorio
-git clone https://github.com/MauBennetts/QuantumARK.git
-cd QuantumARK
-
-# Instalar dependencias básicas
-pip install cryptography
-
-# Para algoritmos PQC completos (RECOMENDADO)
-pip install liboqs-python
-
-# Ejecutar
-python QuantumARK.py
-```
-
-### ⚠️ **Nota sobre liboqs-python**
-La primera vez que ejecutes QuantumARK con PQC, verás:
-```
-liboqs not found, installing it in /Users/[tu_usuario]/_oqs
-Installing in 5 seconds...
-```
-Esto es **normal** - está compilando los algoritmos post-cuánticos. **Espera 10-15 minutos** para la instalación completa.
-
----
-
-## 🏃‍♂️ Inicio Rápido v2.0
-
-### 🔑 **1. Generar Claves Post-Cuánticas**
-1. Abre QuantumARK v2.0
-2. Ve a **"🔑 Claves PQC"**
-3. Click **"Generar Claves Post-Cuánticas"**
-4. Crea una **contraseña fuerte** (16+ caracteres recomendado)
-5. Guarda las claves `.pub` y `.key` en lugar seguro
-
-### 🔒 **2. Cifrar un Archivo**
-1. Ve a **"🔒 Cifrar"**
-2. Selecciona tu archivo
-3. Selecciona la **clave pública** (`.pub`)
-4. ¡El archivo se cifra con algoritmos post-cuánticos! 🎉
-5. Resultado: `archivo.qarq` (nuevo formato v2.0)
-
-### 🔓 **3. Descifrar un Archivo**
-1. Ve a **"🔓 Descifrar"**
-2. Selecciona tu archivo `.qarq`
-3. Selecciona la **clave privada** (`.key`)
-4. Ingresa la **contraseña de la clave privada**
-5. ¡Tu archivo original será restaurado! ✅
-
-### 🚨 **Migración desde v1.x**
-```
-⚠️ IMPORTANTE: v2.0 NO es compatible con archivos .qr256 de v1.x
-📝 ANTES DE ACTUALIZAR:
-1. Descifra TODOS tus archivos .qr256 con QuantumARK v1.x
-2. Actualiza a v2.0
-3. Vuelve a cifrar con algoritmos post-cuánticos reales
+QuantumARK_v3/
+├── 📄 README.md                ← Este archivo
+├── 📄 INSTALL.md               ← Guía de instalación detallada
+├── 🔧 install.sh               ← Script automático (macOS / Linux)
+├── 🦀 Cargo.toml               ← Dependencias y configuración Rust
+├── 🔧 build.rs                 ← Script de build con permisos ACL
+├── ⚙️  tauri.conf.json          ← Configuración de la ventana Tauri
+├── 🖥️  QuantumARK_v3.0          ← Binario compilado (macOS arm64)
+│
+├── src/                        ← Código fuente Rust (backend)
+│   ├── main.rs                 ← Punto de entrada + comandos IPC Tauri
+│   ├── lib.rs                  ← Declaración de módulos
+│   ├── crypto/
+│   │   ├── mod.rs              ← Módulo de criptografía
+│   │   ├── key_manager.rs      ← Kyber-1024 + Dilithium-5 key gen/protect
+│   │   └── cipher.rs           ← Cifrado/descifrado completo de archivos
+│   └── utils/
+│       ├── mod.rs              ← Módulo de utilidades
+│       └── metadata.rs         ← Limpieza de metadatos EXIF/GPS
+│
+├── ui/
+│   └── index.html              ← Interfaz (HTML + CSS + JS inlineados)
+│
+└── permissions/
+    └── autogenerated/          ← Permisos ACL generados por tauri-build
 ```
 
 ---
 
-## 🔬 Tecnología Post-Cuántica
+## ✨ Features
 
-### 🧬 **Arquitectura del Algoritmo v2.0**
+### 🔑 Gestión de Llaves PQC
+- **Generación de par de llaves Kyber-1024 + Dilithium-5** con entropía física del OS (`OsRng`)
+- **Protección de clave privada** con contraseña usando `Argon2id` (resistente a GPU) + `ChaCha20-Poly1305`
+- **Exportar** clave pública/privada al portapapeles o como archivo `.pub` / `.key`
+- Formato JSON estructurado con metadatos del algoritmo incluidos
 
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Archivo       │───▶│   QuantumARK     │───▶│   Archivo       │
-│   Original      │    │   v2.0 PQC       │    │   .qarq         │
-│   (cualquier)   │    │   Multi-Layer    │    │   (post-quantum)│
-└─────────────────┘    └──────────────────┘    └─────────────────┘
+### 🔒 Cifrado de Archivos
+- **Kyber-1024 KEM** — Encapsulación de secreto compartido post-cuántico (NIST FIPS 203)
+- **ChaCha20-Poly1305** — Cifrado simétrico autenticado (AEAD) del contenido
+- **Firma Dilithium-5** — Firma digital para verificar identidad del emisor (NIST FIPS 204)
+- **Doble Factor** — Contraseña adicional mezclada via Argon2id
+- **Compresión automática** antes del cifrado (deflate)
+- **Padding aleatorio** — Agrega bloques de 64KB aleatorios para ocultar el tamaño real
+- **Extensión de salida** — `.qarq` (QuantumARK Quantum-Resistant archive)
 
-              Kyber1024 Key Exchange
-                        ↓
-              HKDF-SHA3-256 Derivation  
-                        ↓
-              ChaCha20-Poly1305 Encryption
-                        ↓
-              Dilithium5 Digital Signature
-```
+### 🗑️ Shredder — Destrucción Segura
+- **1 pase** — Sobrescritura aleatoria rápida
+- **3 pases** — Estándar corporativo seguro
+- **7 pases** — Nivel Militar DoD 5220.22-M (sobrescritura byte a byte)
+- El archivo original se destruye en disco antes de eliminarse
 
-### 🔐 **Mejoras sobre Cifrado Tradicional**
+### 🧹 Eliminación de Metadatos
+- Limpia metadatos **EXIF** de imágenes (cámara, lente, ISO, software)
+- Elimina coordenadas **GPS** embebidas en fotos
+- Borra datos de **autor**, timestamps y software de creación
 
-| Componente | Tradicional RSA+AES | QuantumARK v1.x | QuantumARK v2.0 PQC |
-|------------|-------------------|-----------------|-------------------|
-| **Intercambio de Claves** | RSA-4096 ❌ | Simulado ⚠️ | **Kyber1024** ✅ |
-| **Cifrado Simétrico** | AES-256-GCM | XOR Mejorado | **ChaCha20-Poly1305** ✅ |
-| **Firmas Digitales** | ECDSA/RSA ❌ | Ninguna ❌ | **Dilithium5** ✅ |
-| **Derivación de Claves** | PBKDF2-SHA256 | PBKDF2-SHA256 | **HKDF-SHA3-256** ✅ |
-| **Resistencia Shor** | ❌ Vulnerable | ❌ Vulnerable | ✅ **Resistente** |
-| **Resistencia Grover** | ⚠️ Parcial | ✅ Resistente | ✅ **Resistente** |
-| **Estándar NIST** | Tradicional | Experimental | ✅ **PQC Approved** |
+### 🔓 Descifrado y Verificación
+- **Desencapsulación Kyber-1024** con clave privada del receptor
+- **Verificación de firma Dilithium-5** — Confirma autenticidad e integridad
+- **Soporte doble factor** en descifrado
+- **Validación de integridad SHA3-256** de los datos
 
-### ⚛️ **¿Por qué es Verdaderamente Quantum-Resistant?**
-
-#### **1. Elimina las Vulnerabilidades de Shor**
-```
-RSA/ECDSA → Factorización/Logaritmo Discreto → ❌ Roto por Shor
-Kyber1024 → Module Learning With Errors → ✅ Resistente a Shor
-```
-
-#### **2. Refuerza contra Grover**
-```
-AES-256 → 256 bits → 128 bits efectivos con Grover ⚠️
-ChaCha20 + derivación HKDF → 256 bits mantenidos ✅
-```
-
-#### **3. Firma Post-Cuántica**
-```
-ECDSA → Curvas elípticas → ❌ Vulnerable a Shor
-Dilithium5 → Lattice-based → ✅ Resistente a ataques cuánticos
-```
+### 🖥️ Interfaz de Usuario
+- **GUI nativa** construida con Rust + Tauri v2 (WKWebView en macOS)
+- Diseño **glassmorphic premium** con tema oscuro y animaciones fluidas
+- **Drag & Drop** de archivos desde el explorador de archivos
+- **Consola de diagnóstico** en tiempo real con logs de todas las operaciones
 
 ---
 
-## 🛡️ Análisis de Seguridad v2.0
-
-### 🎯 **Nivel de Protección Post-Cuántica**
+## 🛡️ Arquitectura Criptográfica
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    LÍNEA DE TIEMPO CUÁNTICA                 │
+│  CAPA 1 — KEM (Key Encapsulation Mechanism)                 │
+│  Kyber-1024 (CRYSTALS-Kyber) — NIST FIPS 203               │
+│  Nivel de seguridad: equivalente a AES-256                  │
 ├─────────────────────────────────────────────────────────────┤
-│ 🔓 RSA/ECDSA (Tradicional)     │ Vulnerable HOY si Q-Day   │
-│ 🔐 AES-256 (Actual)            │ Seguro hasta ~2035        │
-│ 🔒 QuantumARK v1.x             │ Seguro hasta ~2050        │
-│ ⚛️ QuantumARK v2.0 PQC         │ Seguro hasta ~2100+       │
-│ 🚀 Computadoras Cuánticas      │ Estimado: 2030-2040       │
+│  CAPA 2 — Cifrado Simétrico Autenticado                     │
+│  ChaCha20-Poly1305 — AEAD (RFC 8439)                        │
+│  Autenticación del mensaje incluida                         │
+├─────────────────────────────────────────────────────────────┤
+│  CAPA 3 — Firma Digital Post-Cuántica                       │
+│  Dilithium-5 (CRYSTALS-Dilithium) — NIST FIPS 204           │
+│  Verificación de autenticidad e integridad del emisor       │
+├─────────────────────────────────────────────────────────────┤
+│  CAPA 4 — Derivación de Clave                               │
+│  Argon2id (RFC 9106) + HKDF-SHA3-256                        │
+│  Resistente a ataques de fuerza bruta con GPU/ASIC          │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 🧪 **Resistencia a Ataques Cuánticos**
+---
 
-| Tipo de Ataque | Algoritmo Usado | Resistencia v2.0 | Explicación |
-|----------------|-----------------|------------------|-------------|
-| **Algoritmo de Shor** | Kyber1024 | ✅ **Inmune** | MLWE no factorizable |
-| **Algoritmo de Grover** | ChaCha20+HKDF | ✅ **Resistente** | 256 bits efectivos mantenidos |
-| **Análisis Diferencial** | ChaCha20 | ✅ **Inmune** | Stream cipher + nonce único |
-| **Análisis de Lattice** | Kyber/Dilithium | ✅ **Resistente** | Parámetros NIST optimizados |
-| **Side-Channel** | Software | ⚠️ **Mitigado** | Implementación en software |
-| **Ataques Clásicos** | Todos | ✅ **Resistente** | Mantiene seguridad tradicional |
+## 💻 Instalación y Compilación
 
-### 🔍 **Verificación de Integridad Post-Cuántica**
+### ⚡ Opción Rápida — Script Automático (macOS / Linux)
 
-QuantumARK v2.0 incluye verificación en **múltiples capas**:
+```bash
+git clone https://github.com/tu-usuario/quantumark-v3
+cd quantumark-v3
+chmod +x install.sh
+./install.sh
+```
 
-1. **SHA3-256 Checksum** del archivo original
-2. **Metadatos cifrados** con ChaCha20-Poly1305  
-3. **Autenticación AEAD** integrada
-4. **Firma Dilithium5** del archivo completo cifrado
-5. **Verificación de estructura** del formato .qarq
-6. **Detección automática** de manipulación
+El script detecta tu OS automáticamente e instala todo lo necesario.
 
 ---
 
-## 📁 Formato de Archivo .qarq (Quantum ARK v2)
+### 🍎 macOS
 
-### 🗂️ **Estructura Interna Post-Cuántica**
+#### Dependencias
+```bash
+# 1. Instalar Xcode Command Line Tools
+xcode-select --install
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     ARCHIVO .qarq                           │
-├─────────────────────┬───────────────────────────────────────┤
-│ Header (8 bytes)    │ "QARQ2.0\x00" - Identificador        │
-├─────────────────────┼───────────────────────────────────────┤
-│ Ciphertext Size (4) │ Tamaño del ciphertext Kyber          │
-├─────────────────────┼───────────────────────────────────────┤
-│ Kyber Ciphertext    │ Secreto encapsulado (1,568 bytes)    │
-├─────────────────────┼───────────────────────────────────────┤
-│ HKDF Salt (32)      │ Salt para derivación de clave        │
-├─────────────────────┼───────────────────────────────────────┤
-│ ChaCha20 Nonce (12) │ Nonce único para cifrado             │
-├─────────────────────┼───────────────────────────────────────┤
-│ Metadata Size (4)   │ Tamaño de metadatos cifrados         │
-├─────────────────────┼───────────────────────────────────────┤
-│ Encrypted Metadata  │ Información del archivo (cifrada)    │
-├─────────────────────┼───────────────────────────────────────┤
-│ Encrypted Data      │ Datos principales (ChaCha20-Poly1305)│
-├─────────────────────┼───────────────────────────────────────┤
-│ Dilithium Signature │ Firma digital del archivo completo   │
-│ (.sig file)         │ (archivo separado opcional)          │
-└─────────────────────┴───────────────────────────────────────┘
+# 2. Instalar Homebrew (si no lo tienes)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# 3. Instalar Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.cargo/env
 ```
 
-### 📋 **Metadatos Post-Cuánticos**
+#### Compilar y ejecutar
+```bash
+# Clonar el repositorio
+git clone https://github.com/tu-usuario/quantumark-v3
+cd quantumark-v3
 
-```json
-{
-  "filename": "documento.pdf",
-  "size": 1048576,
-  "checksum": "sha3-256:a1b2c3d4...",
-  "timestamp": 1703980800.0,
-  "algorithm": "PQC-ChaCha20-Poly1305-Kyber1024-Dilithium5",
-  "version": "2.0.0",
-  "pqc_enabled": true,
-  "key_algorithms": {
-    "kem": "Kyber1024",
-    "signature": "Dilithium5", 
-    "cipher": "ChaCha20-Poly1305",
-    "kdf": "HKDF-SHA3-256"
-  }
-}
+# Compilar en modo release
+cargo build --release
+
+# Ejecutar
+./target/release/quantumark-tauri
 ```
+
+> **Nota macOS:** WebKit ya está incluido en macOS. No se necesitan dependencias adicionales de sistema.
 
 ---
 
-## ⚙️ Instalación y Configuración v2.0
+### 🪟 Windows
 
-### 📋 **Requisitos del Sistema Actualizados**
+#### Dependencias
 
-| Componente | Mínimo | Recomendado | Para Compilar PQC |
-|------------|--------|-------------|-------------------|
-| **Sistema Operativo** | Windows 10 / macOS 10.15 / Ubuntu 18.04 | Windows 11 / macOS 12+ / Ubuntu 22.04+ | Same |
-| **RAM** | 1 GB | 4 GB+ | 8 GB+ |
-| **Almacenamiento** | 200 MB | 1 GB+ | 5 GB+ |
-| **Python** | 3.7+ | 3.10+ | 3.10+ |
-| **Compiladores** | N/A | N/A | Visual Studio Build Tools (Win) |
+1. **Visual Studio Build Tools** (requerido por Rust en Windows):
+   - Descarga: https://visualstudio.microsoft.com/visual-cpp-build-tools/
+   - Selecciona: `Desktop development with C++`
 
-### 🔧 **Dependencias Python v2.0**
+2. **Rust**:
+   - Descarga `rustup-init.exe` desde: https://rustup.rs
+   - Ejecuta el instalador y sigue las instrucciones
 
-```bash
-# Dependencias básicas (OBLIGATORIAS)
-cryptography>=41.0.0    # Crypto operations
-tkinter>=8.6           # GUI framework (built-in)
+3. **WebView2** (incluido en Windows 11, para Windows 10 descargar):
+   - https://developer.microsoft.com/en-us/microsoft-edge/webview2/
 
-# Dependencias PQC (RECOMENDADAS para seguridad completa)
-liboqs-python>=0.8.0   # NIST Post-Quantum algorithms
+4. **(Opcional) Git**:
+   - https://git-scm.com/download/win
 
-# Dependencias opcionales
-pillow>=10.0.0         # Image support for icons
+#### Compilar y ejecutar
+```powershell
+# En PowerShell o CMD
+git clone https://github.com/tu-usuario/quantumark-v3
+cd quantumark-v3
+
+# Compilar
+cargo build --release
+
+# Ejecutar
+.\target\release\quantumark-tauri.exe
 ```
 
-### 🛠️ **Compilar v2.0 desde Código**
+> **Nota Windows:** El binario en `target\release\quantumark-tauri.exe` es portátil y puede moverse a cualquier carpeta.
 
+---
+
+### 🐧 Linux — Ubuntu / Debian
+
+#### Dependencias
 ```bash
-# 1. Preparar entorno
-git clone https://github.com/MauBennetts/QuantumARK.git
-cd QuantumARK
-python -m venv quantumark_env
-source quantumark_env/bin/activate  # Linux/Mac
-# o
-quantumark_env\Scripts\activate     # Windows
+# Actualizar repositorios
+sudo apt-get update
 
-# 2. Instalar dependencias básicas
-pip install cryptography
+# Instalar dependencias del sistema
+sudo apt-get install -y \
+  build-essential \
+  curl \
+  pkg-config \
+  libssl-dev \
+  libgtk-3-dev \
+  libwebkit2gtk-4.1-dev \
+  libappindicator3-dev \
+  librsvg2-dev
 
-# 3. Instalar algoritmos PQC (puede tomar 10-15 minutos)
-pip install liboqs-python
-
-# 4. Ejecutar
-python QuantumARK.py
-
-# 5. (Opcional) Crear ejecutable
-pip install pyinstaller
-pyinstaller --onefile --windowed --icon=assets/atom.ico --name="QuantumARK-v2" QuantumARK.py
+# Instalar Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.cargo/env
 ```
 
-### 🐛 **Solución de Problemas**
-
+#### Compilar y ejecutar
 ```bash
-# Si liboqs-python falla en Windows
-# Instalar Visual Studio Build Tools primero
-
-# Si liboqs-python falla en Linux
-sudo apt-get install cmake ninja-build
-pip install liboqs-python
-
-# Si liboqs-python falla en macOS  
-brew install cmake ninja
-pip install liboqs-python
-
-# Modo fallback (sin PQC)
-# QuantumARK funcionará solo con ChaCha20-Poly1305
+git clone https://github.com/tu-usuario/quantumark-v3
+cd quantumark-v3
+cargo build --release
+./target/release/quantumark-tauri
 ```
 
 ---
 
-## 📊 Rendimiento y Benchmarks v2.0
+### 🐧 Linux — Fedora / RHEL / CentOS
 
-### ⏱️ **Velocidad de Cifrado Post-Cuántico**
-
-```
-Tamaño Archivo    │ AES-256+RSA │ QuantumARK v1 │ QuantumARK v2 PQC │ Overhead
-──────────────────┼─────────────┼───────────────┼───────────────────┼─────────
-1 KB              │ <1ms        │ 2ms           │ 3ms               │ 3x
-1 MB              │ 15ms        │ 25ms          │ 45ms              │ 3x
-10 MB             │ 150ms       │ 280ms         │ 420ms             │ 2.8x
-100 MB            │ 1.5s        │ 3.1s          │ 4.2s              │ 2.8x
-1 GB              │ 15s         │ 35s           │ 48s               │ 3.2x
-```
-
-### 🔑 **Rendimiento de Operaciones PQC**
-
-```
-Operación PQC           │ Tiempo      │ Tamaño        │ Comparación
-────────────────────────┼─────────────┼───────────────┼─────────────
-Generar claves Kyber    │ ~20ms       │ 4.7KB total   │ vs RSA: +2ms
-Encapsular secreto      │ ~5ms        │ 1.6KB cipher  │ vs RSA: -10ms
-Desencapsular secreto   │ ~8ms        │ N/A           │ vs RSA: -15ms
-Generar claves Dilithium│ ~30ms       │ 8.7KB total   │ vs ECDSA: +25ms
-Firmar con Dilithium    │ ~15ms       │ 4.6KB sig     │ vs ECDSA: +10ms
-Verificar firma         │ ~10ms       │ N/A           │ vs ECDSA: +5ms
-```
-
-### 💾 **Uso de Memoria v2.0**
-
-```
-Operación               │ Memoria Base │ Memoria v2.0  │ Factor │ Nota
-────────────────────────┼──────────────┼───────────────┼────────┼──────────
-GUI Inactiva            │ 15 MB        │ 45 MB         │ 3x     │ liboqs loaded
-Generando claves PQC    │ 25 MB        │ 85 MB         │ 3.4x   │ Peak usage
-Cifrando 10MB           │ 35 MB        │ 95 MB         │ 2.7x   │ Working set
-Cifrando 100MB          │ 55 MB        │ 145 MB        │ 2.6x   │ Efficient
-Firmando archivo        │ +5 MB        │ +15 MB        │ 3x     │ Dilithium
-```
-
-### 🎯 **Casos de Uso Óptimos v2.0**
-
-| ✅ **IDEAL para QuantumARK v2.0** | ⚠️ **Aceptable con consideraciones** | ❌ **No recomendado** |
-|-----------------------------------|-------------------------------------|----------------------|
-| Documentos gubernamentales | Backups automáticos frecuentes | Streaming en tiempo real |
-| Investigación científica confidencial | Aplicaciones móviles modernas | IoT con recursos muy limitados |
-| Propiedad intelectual valiosa | Bases de datos pequeñas-medianas | Gaming de ultra-baja latencia |
-| Archivos legales a largo plazo | Comunicaciones asíncronas | Sistemas embebidos básicos |
-| Datos médicos sensibles | Archivos multimedia grandes | Aplicaciones de alto throughput |
-| Información financiera crítica | Desarrollo de software | Sistemas real-time críticos |
-
----
-
-## 🔗 API y Integración v2.0
-
-### 🐍 **Uso Programático Post-Cuántico**
-
-```python
-from quantumark_v2 import PQCKeyManager, QuantumResistantCipher
-
-# Generar claves post-cuánticas
-key_manager = PQCKeyManager()
-public_key, private_key = key_manager.generate_keypair()
-
-# Crear cifrador
-cipher = QuantumResistantCipher()
-
-# Cifrar con algoritmos PQC
-plaintext = b"Datos ultra secretos resistentes a computadoras cuánticas"
-ciphertext, salt, nonce, encrypted_data = cipher.encrypt_with_pqc(
-    plaintext, public_key
-)
-
-# Descifrar
-decrypted_data = cipher.decrypt_with_pqc(
-    ciphertext, salt, nonce, encrypted_data, private_key
-)
-
-# Firmar datos
-signature = key_manager.sign_data(private_key, encrypted_data)
-
-# Verificar firma
-is_valid = key_manager.verify_signature(public_key, encrypted_data, signature)
-```
-
-### 🔌 **Integración CLI v2.0**
-
+#### Dependencias
 ```bash
-# Generar claves post-cuánticas
-quantumark keygen --output my_keys --password "super_secure_password"
+sudo dnf install -y \
+  gcc gcc-c++ make curl pkg-config \
+  openssl-devel \
+  gtk3-devel \
+  webkit2gtk4.1-devel \
+  librsvg2-devel
 
-# Cifrar archivo con PQC
-quantumark encrypt documento.pdf --public-key my_keys.pub --output documento.qarq
+# Instalar Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.cargo/env
+```
 
-# Descifrar archivo
-quantumark decrypt documento.qarq --private-key my_keys.key --password "super_secure_password"
-
-# Verificar archivo cifrado
-quantumark verify documento.qarq --public-key my_keys.pub
-
-# Información sobre algoritmos PQC
-quantumark info --pqc-status
+#### Compilar
+```bash
+cargo build --release
+./target/release/quantumark-tauri
 ```
 
 ---
 
-## 🧪 Testing y Validación v2.0
+### 🐧 Linux — Arch Linux
 
-### ✅ **Tests Post-Cuánticos Incluidos**
-
+#### Dependencias
 ```bash
-# Suite completa de tests v2.0
-python -m pytest tests/ -v --pqc
+sudo pacman -Sy --noconfirm \
+  base-devel curl git pkgconf openssl \
+  gtk3 webkit2gtk-4.1 librsvg patchelf
 
-# Tests específicos por componente
-python -m pytest tests/test_kyber.py          # Kyber1024 KEM
-python -m pytest tests/test_dilithium.py      # Dilithium5 signatures  
-python -m pytest tests/test_chacha20.py       # ChaCha20-Poly1305
-python -m pytest tests/test_hkdf.py           # HKDF-SHA3-256
-python -m pytest tests/test_integration.py    # End-to-end PQC
-python -m pytest tests/test_compatibility.py  # Backward compatibility
-python -m pytest tests/test_security.py       # Security vectors
-python -m pytest tests/test_performance.py    # Performance benchmarks
-
-# Tests de vectores NIST
-python -m pytest tests/test_nist_vectors.py   # Official test vectors
+# Instalar Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.cargo/env
 ```
 
-### 🛡️ **Auditorías de Seguridad v2.0**
+#### Compilar
+```bash
+cargo build --release
+./target/release/quantumark-tauri
+```
 
-#### **Análisis Estático Continuo**
-- ✅ **Bandit**: Scan automático de vulnerabilidades Python
-- ✅ **Semgrep**: Análisis de patrones de seguridad 
-- ✅ **Safety**: Verificación de dependencias vulnerables
-- ✅ **CodeQL**: Análisis profundo de código
-- 🔄 **SonarQube**: Calidad y seguridad de código
+---
 
-#### **Validación Criptográfica**
-- ✅ **NIST Test Vectors**: Validación contra vectores oficiales
-- ✅ **Known Answer Tests**: Verificación de implementación
-- ✅ **Randomness Tests**: NIST SP 800-22 statistical tests
-- ✅ **Side-Channel Analysis**: Timing attack resistance
-- 🔄 **Formal Verification**: Análisis matemático formal
+## 🔧 Especificaciones Técnicas
 
-#### **Penetration Testing**
-- ✅ **Manual Testing**: Expertos en criptografía
-- ✅ **Automated Scanning**: Herramientas especializadas
-- 🔄 **Third-Party Audit**:
+| Componente | Estándar | Nivel |
+|---|---|---|
+| KEM | CRYSTALS-Kyber (NIST FIPS 203) | Post-Cuántico |
+| DSA | CRYSTALS-Dilithium (NIST FIPS 204) | Post-Cuántico |
+| Cifrado | ChaCha20-Poly1305 (RFC 8439) | AEAD |
+| KDF | Argon2id (RFC 9106) | Memory-hard |
+| Hash | SHA3-256 (NIST FIPS 202) | — |
+| Entropía | OsRng (getrandom) | Hardware |
+
+| Tecnología | Versión |
+|---|---|
+| Rust | 2021 edition |
+| Tauri | v2.x |
+| pqcrypto-kyber | 0.8.x |
+| pqcrypto-dilithium | 0.5.x |
+| chacha20poly1305 | 0.10.x |
+| argon2 | 0.5.x |
+
+**Plataformas:** macOS (arm64 / x86_64), Windows (x86_64), Linux (x86_64)  
+**Telemetría:** Ninguna — 100% local  
+**Dependencias en runtime:** Ninguna (binario estático)
+
+---
+
+## 📁 Formato del archivo `.qarq`
+
+```
+archivo.qarq
+├── Magic Header       "QARQ" (4 bytes) + versión (2 bytes)
+├── Kyber1024 Ciphertext           1568 bytes
+├── Dilithium5 Signature           4595 bytes
+├── Argon2id Salt                    32 bytes  (solo con contraseña)
+├── ChaCha20 Nonce                   12 bytes
+├── Padding Size                      8 bytes  (solo con ofuscación)
+└── Encrypted Payload        (ChaCha20-Poly1305)
+    └── compresión deflate + datos originales + padding aleatorio
+```
+
+---
+
+## ⚠️ Notas de Seguridad
+
+1. **Guarda tus claves** en un lugar seguro. Sin la clave privada, **es imposible recuperar archivos cifrados**.
+2. La **contraseña de protección** de clave privada no tiene recuperación si la olvidas.
+3. El **Shredder de 7 pases** es **permanente e irreversible**.
+4. **Kyber-1024** y **Dilithium-5** fueron seleccionados por el NIST en 2024 como estándares post-cuánticos oficiales.
+
+---
+
+## 📅 Historial de Versiones
+
+| Versión | Descripción |
+|---|---|
+| **v3.0** | Reescritura completa en Rust + Tauri. Kyber-1024 + Dilithium-5. GUI premium glassmorphic. Shredder multi-pase. Eliminación de metadatos. |
+| **v2.0** | Python. Kyber + Dilithium. CLI + GUI básica Tkinter. |
+| **v1.0** | Prototipo Python con criptografía clásica. |
+
+---
+
+*QuantumARK v3.0 — Construido con ❤️ en Rust. Preparado para la era post-cuántica.*
