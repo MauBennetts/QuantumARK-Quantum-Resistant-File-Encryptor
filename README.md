@@ -1,6 +1,21 @@
-# QuantumARK v3.0 — Post-Quantum Cryptography Suite
+<p align="center">
+  <img src="https://img.shields.io/badge/Language-Rust-orange?style=for-the-badge&logo=rust&logoColor=white" alt="Language Rust">
+  <img src="https://img.shields.io/badge/Framework-Tauri%20v2-blue?style=for-the-badge&logo=tauri&logoColor=white" alt="Framework Tauri v2">
+  <img src="https://img.shields.io/badge/Security-Post--Quantum-purple?style=for-the-badge&logo=dependabot&logoColor=white" alt="Security Post-Quantum">
+  <img src="https://img.shields.io/badge/NIST-FIPS%20203%20%2F%20204-success?style=for-the-badge" alt="NIST FIPS 203/204">
+</p>
 
-> **Suite de criptografía post-cuántica de grado militar.** Protege tus archivos contra ordenadores cuánticos y adversarios avanzados mediante los algoritmos oficiales del NIST para la era post-cuántica.
+<h1 align="center">🔐 QuantumARK v3.0</h1>
+
+<p align="center">
+  <strong>Post-Quantum Cryptography Suite</strong><br>
+  <sub>Suite de criptografía post-cuántica de grado militar. Protege tus archivos contra ordenadores cuánticos y adversarios avanzados mediante los algoritmos oficiales del NIST para la era post-cuántica.</sub>
+</p>
+
+---
+
+> [!WARNING]
+> **Proyecto en Desarrollo (Work in Progress):** Esta suite criptográfica se encuentra en fase activa de desarrollo y pruebas. Algunas secciones de código, validaciones o características avanzadas pueden experimentar fallas o comportamientos inesperados en ciertos sistemas. Se recomienda discreción y realizar respaldos; no utilizar para datos altamente críticos en producción todavía.
 
 ---
 
