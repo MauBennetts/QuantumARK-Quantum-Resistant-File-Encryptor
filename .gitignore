@@ -1,0 +1,23 @@
+# Rust build artifacts
+target/
+
+# Tauri build artifacts
+src-tauri/target/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# IDE configuration files
+.vscode/
+.idea/
+*.suo
+*.ntvsca*
+*.njsproj
+*.sln
+*.sw?
+
+# Legacy compiled binaries
+QuantumARK_v3.0
+QuantumARK_v3.1
+blackprism-tauri

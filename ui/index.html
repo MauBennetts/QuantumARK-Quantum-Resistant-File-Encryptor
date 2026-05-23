@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BlackPrism v4.0 - Post-Quantum Cryptography Suite</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Share+Tech+Mono&display=swap');
+
+    :root {
+      --bg-dark: #000000;
+      --bg-card: rgba(10, 10, 12, 0.6);
+      --bg-card-hover: rgba(18, 18, 22, 0.75);
+      --border-color: rgba(255, 255, 255, 0.05);
+      --border-glow: rgba(139, 92, 246, 0.25);
+      --accent-purple: #8b5cf6;
+      --accent-purple-glow: rgba(139, 92, 246, 0.4);
+      --accent-cyan: #06b6d4;
+      --accent-cyan-glow: rgba(6, 182, 212, 0.4);
+      --accent-indigo: #6366f1;
+      --accent-green: #10b981;
+      --text-primary: #f9fafb;
+      --text-secondary: #9ca3af;
+      --text-muted: #4b5563;
+      --neon-green: #10b981;
+      --neon-yellow: #fbbf24;
+      --neon-red: #f87171;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; -webkit-font-smoothing: antialiased; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden; /* Sin scroll externo — la ventana llena el viewport exacto */
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      padding: 12px;
+    }
+
+    .glow-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -3; overflow: hidden; }
+    .blob { position: absolute; border-radius: 50%; filter: blur(140px); opacity: 0.07; animation: float 25s infinite alternate ease-in-out; }
+    .blob-purple { width: 40vw; height: 40vw; background: var(--accent-purple); top: -10%; left: -10%; animation-duration: 25s; }
+    .blob-cyan { width: 45vw; height: 45vw; background: var(--accent-cyan); bottom: -15%; right: -10%; animation-duration: 30s; }
+    .blob-indigo { width: 35vw; height: 35vw; background: var(--accent-indigo); top: 40%; left: 30%; animation-duration: 22s; }
+
+    @keyframes float {
+      0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+      100% { transform: translate(6%, 8%) scale(1.1) rotate(360deg); }
+    }
+
+    #geometric-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -2;
+      pointer-events: none;
+      background: transparent;
+    }
+
+    .app-container {
+      width: 100%; max-width: 1100px;
+      background: rgba(8, 8, 10, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      padding: 18px 24px;
+      display: flex; flex-direction: column; gap: 14px;
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.95), 0 0 50px rgba(139, 92, 246, 0.02);
+      /* Ocupa el 100% del alto disponible sin scroll externo */
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .app-header { text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 12px; flex-shrink: 0; }
+    .logo-container { display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 4px; }
+    .shield-logo { width: 42px; height: 42px; filter: drop-shadow(0 0 10px var(--accent-purple-glow)); animation: pulse-glow 3s infinite alternate ease-in-out; }
+
+    @keyframes pulse-glow {
+      0% { filter: drop-shadow(0 0 8px var(--accent-purple-glow)); }
+      100% { filter: drop-shadow(0 0 20px var(--accent-cyan-glow)); }
+    }
+
+    .logo-text h1 { font-size: 1.8rem; font-weight: 800; letter-spacing: 1px; color: var(--text-primary); display: flex; align-items: center; gap: 2px; }
+    .logo-text h1 span { background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .version-badge { font-size: 0.72rem; padding: 2px 7px; background: rgba(168, 85, 247, 0.2); border: 1px solid var(--accent-purple); border-radius: 12px; color: #d8b4fe; font-weight: 600; margin-left: 10px; vertical-align: middle; }
+    .subtitle { color: var(--text-secondary); font-size: 0.82rem; font-weight: 300; letter-spacing: 0.5px; }
+
+    .app-nav { display: flex; gap: 6px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 14px; padding: 5px; flex-wrap: wrap; flex-shrink: 0; }
+    .nav-tab { flex: 1; min-width: 110px; background: transparent; border: none; color: var(--text-secondary); padding: 9px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border-radius: 10px; display: flex; justify-content: center; align-items: center; gap: 7px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .nav-tab:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-primary); }
+    .nav-tab.active { background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(6, 182, 212, 0.2)); border: 1px solid var(--border-glow); color: var(--text-primary); box-shadow: 0 0 15px rgba(168, 85, 247, 0.15); }
+    .tab-icon { font-size: 1.05rem; }
+
+    /* app-main: flex:1 para ocupar todo el espacio restante, overflow interno por pestaña */
+    .app-main { flex: 1; min-height: 0; overflow: hidden; position: relative; }
+    .tab-content { display: none; animation: fadeIn 0.35s ease-out; height: 100%; overflow-y: auto; }
+    .tab-content.active { display: block; }
+    /* Scrollbar personalizado dentro de las pestañas */
+    .tab-content::-webkit-scrollbar { width: 5px; }
+    .tab-content::-webkit-scrollbar-track { background: transparent; }
+    .tab-content::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radius: 10px; }
+    .tab-content::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.5); }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .grid-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding-bottom: 4px; }
+    @media (max-width: 768px) { .grid-layout { grid-template-columns: 1fr; } }
+
+    .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s ease; }
+    .card:hover { background: var(--bg-card-hover); border-color: rgba(168, 85, 247, 0.35); }
+    .shadow-glow { box-shadow: 0 10px 30px rgba(168, 85, 247, 0.04); }
+    .card-title { font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+    .accent-purple { color: var(--accent-purple); font-size: 0.8rem; text-shadow: 0 0 8px var(--accent-purple-glow); }
+    .accent-cyan { color: var(--accent-cyan); font-size: 0.8rem; text-shadow: 0 0 8px var(--accent-cyan-glow); }
+    .accent-green { color: var(--accent-green); font-size: 0.8rem; text-shadow: 0 0 8px rgba(16, 185, 129, 0.5); }
+    .card-desc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; }
+
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    label { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); letter-spacing: 0.3px; }
+
+    .input-glow, .select-glow, .textarea-key, .textarea-small, .textarea-medium, .textarea-hash {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      color: var(--text-primary);
+      padding: 12px 16px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+    .input-glow:focus, .select-glow:focus, .textarea-key:focus, .textarea-small:focus, .textarea-medium:focus, .textarea-hash:focus {
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.2);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .help-text { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; }
+
+    .textarea-key { height: 120px; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; line-height: 1.4; resize: none; background: rgba(0, 0, 0, 0.2); border-color: rgba(255, 255, 255, 0.05); }
+    .textarea-small { height: 60px; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; resize: none; }
+    .textarea-medium { height: 90px; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; resize: none; }
+    .textarea-hash { height: 44px; font-family: 'Share Tech Mono', monospace; font-size: 0.82rem; resize: none; }
+
+    /* Hash result field with copy button */
+    .hash-output-wrapper { position: relative; display: flex; align-items: center; gap: 8px; }
+    .hash-output-wrapper .textarea-hash { padding-right: 48px; }
+    .hash-copy-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 8px; color: var(--accent-purple); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.8rem; transition: all 0.2s ease; }
+    .hash-copy-btn:hover { background: rgba(168, 85, 247, 0.3); }
+
+    /* Hash match indicator */
+    .hash-match-indicator { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 10px; font-size: 0.82rem; font-weight: 600; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); }
+    .hash-match-indicator.match { background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.35); color: var(--neon-green); }
+    .hash-match-indicator.mismatch { background: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.35); color: var(--neon-red); }
+    .hash-match-indicator.idle { color: var(--text-muted); }
+
+    /* Algo selector grid */
+    .algo-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    @media (max-width: 700px) { .algo-grid { grid-template-columns: repeat(3, 1fr); } }
+    .algo-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; color: var(--text-secondary); padding: 9px 6px; font-size: 0.78rem; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.2s ease; font-family: 'Share Tech Mono', monospace; }
+    .algo-btn:hover { border-color: rgba(168, 85, 247, 0.4); color: var(--text-primary); background: rgba(168, 85, 247, 0.08); }
+    .algo-btn.active { background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(6, 182, 212, 0.15)); border-color: var(--accent-purple); color: var(--text-primary); box-shadow: 0 0 10px rgba(168, 85, 247, 0.2); }
+
+    /* Full-width card */
+    .card-full { grid-column: span 2; }
+    @media (max-width: 768px) { .card-full { grid-column: span 1; } }
+
+    /* Hash results panel */
+    .hash-results-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 600px) { .hash-results-panel { grid-template-columns: 1fr; } }
+
+    .hash-result-box { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .hash-result-label { font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 6px; }
+    .hash-result-value { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--accent-cyan); word-break: break-all; line-height: 1.5; padding: 8px 12px; background: rgba(6,182,212,0.05); border-radius: 8px; border: 1px solid rgba(6,182,212,0.1); cursor: pointer; transition: all 0.2s ease; }
+    .hash-result-value:hover { background: rgba(6,182,212,0.1); }
+    .hash-result-value.empty { color: var(--text-muted); font-style: italic; }
+
+    /* Zeroize badge pill */
+    .zeroize-pill { display: inline-flex; align-items: center; gap: 5px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 20px; padding: 4px 10px; font-size: 0.72rem; font-weight: 600; color: var(--neon-green); opacity: 0; transform: translateY(-4px); transition: all 0.4s ease; }
+    .zeroize-pill.show { opacity: 1; transform: translateY(0); }
+
+    .drop-zone { border: 2px dashed rgba(168, 85, 247, 0.3); background: rgba(168, 85, 247, 0.02); border-radius: 16px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+    .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent-cyan); background: rgba(6, 182, 212, 0.04); box-shadow: 0 0 20px rgba(6, 182, 212, 0.1); transform: translateY(-2px); }
+    .drop-icon { font-size: 2.2rem; animation: bounce 2s infinite ease-in-out; }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    .drop-text { font-size: 0.85rem; color: var(--text-secondary); }
+    .drop-file-info { display: flex; flex-direction: column; gap: 4px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 8px 16px; border-radius: 10px; max-width: 100%; }
+    .file-name { font-size: 0.85rem; font-weight: 600; color: var(--accent-cyan); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 300px; }
+    .file-size { font-size: 0.75rem; color: var(--text-muted); }
+    .hidden { display: none !important; }
+
+    .btn { border: none; color: var(--text-primary); padding: 14px 24px; font-size: 0.95rem; font-weight: 600; border-radius: 12px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+    .btn-primary { background: linear-gradient(135deg, #6d28d9, #4c1d95); box-shadow: 0 4px 15px rgba(109, 40, 217, 0.35); }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5); }
+    .btn-purple { background: linear-gradient(135deg, #7c3aed, #5b21b6); box-shadow: 0 4px 15px rgba(124, 58, 237, 0.35); }
+    .btn-purple:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5); }
+    .btn-cyan { background: linear-gradient(135deg, #6d28d9, #4c1d95); box-shadow: 0 4px 15px rgba(109, 40, 217, 0.35); }
+    .btn-cyan:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5); }
+    .btn-green { background: linear-gradient(135deg, #7c3aed, #4c1d95); box-shadow: 0 4px 15px rgba(109, 40, 217, 0.35); }
+    .btn-green:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5); }
+    .btn-glow::after { content: ''; position: absolute; top: 0; left: -50%; width: 200%; height: 100%; background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.15), transparent); transform: skewX(-25deg); transition: 0.75s; }
+    .btn-glow:hover:not(:disabled)::after { left: 125%; }
+    .btn-icon { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.85rem; transition: all 0.2s ease; }
+    .btn-icon:hover { background: rgba(255, 255, 255, 0.12); transform: scale(1.05); }
+
+    .key-output-container { display: flex; flex-direction: column; gap: 15px; }
+    .key-box { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .key-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; }
+    .key-actions { display: flex; gap: 6px; }
+
+    .security-options-list { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    @media (max-width: 600px) { .security-options-list { grid-template-columns: 1fr; } }
+    .toggle-option { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.04); padding: 14px 18px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+    .col-span-2 { grid-column: span 2; }
+    @media (max-width: 600px) { .col-span-2 { grid-column: span 1; } }
+    .option-desc { display: flex; flex-direction: column; gap: 3px; }
+    .option-desc strong { font-size: 0.85rem; color: var(--text-primary); }
+    .option-desc span { font-size: 0.72rem; color: var(--text-secondary); line-height: 1.3; }
+
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.1); transition: .3s; border: 1px solid rgba(255, 255, 255, 0.08); }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; }
+    input:checked + .slider { background-color: var(--accent-purple); border-color: var(--border-glow); }
+    input:checked + .slider:before { transform: translateX(20px); }
+    .slider.round { border-radius: 34px; }
+    .slider.round:before { border-radius: 50%; }
+
+    .select-wrapper { position: relative; width: 180px; }
+    @media (max-width: 600px) { .select-wrapper { width: 100%; } }
+    .select-glow { width: 100%; padding: 10px 14px; cursor: pointer; border-radius: 10px; appearance: none; background: rgba(255, 255, 255, 0.04); }
+    .select-glow option { background-color: var(--bg-dark); color: var(--text-primary); padding: 10px; }
+
+    /* Terminal: tamaño fijo compacto, no crece */
+    .app-terminal { background: rgba(5, 4, 12, 0.95); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; overflow: hidden; box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9); flex-shrink: 0; }
+    .terminal-header { background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid rgba(255, 255, 255, 0.06); padding: 7px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .terminal-title { font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; color: var(--text-secondary); letter-spacing: 0.5px; }
+    .terminal-badges { display: flex; align-items: center; gap: 8px; }
+    .btn-clear { background: transparent; border: none; color: var(--text-muted); font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; cursor: pointer; transition: color 0.2s ease; }
+    .btn-clear:hover { color: var(--text-primary); }
+    .terminal-body { height: 90px; padding: 10px 14px; overflow-y: auto; font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; display: flex; flex-direction: column; gap: 5px; line-height: 1.4; }
+    .terminal-body::-webkit-scrollbar { width: 4px; }
+    .terminal-body::-webkit-scrollbar-track { background: transparent; }
+    .terminal-body::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radius: 10px; }
+    .log-line { word-break: break-all; }
+    .text-green { color: var(--neon-green); text-shadow: 0 0 5px rgba(16, 185, 129, 0.3); }
+    .text-cyan { color: var(--accent-cyan); text-shadow: 0 0 5px rgba(6, 182, 212, 0.3); }
+    .text-yellow { color: var(--neon-yellow); text-shadow: 0 0 5px rgba(245, 158, 11, 0.3); }
+    .text-red { color: var(--neon-red); text-shadow: 0 0 5px rgba(239, 68, 68, 0.3); }
+    .text-white { color: var(--text-primary); }
+    .text-purple { color: var(--accent-purple); text-shadow: 0 0 5px rgba(168, 85, 247, 0.3); }
+    .loader { border: 2px solid rgba(255, 255, 255, 0.2); border-top: 2px solid var(--text-primary); border-radius: 50%; width: 18px; height: 18px; animation: spin 0.8s linear infinite; display: inline-block; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="glow-bg">
+    <div class="blob blob-purple"></div>
+    <div class="blob blob-cyan"></div>
+    <div class="blob blob-indigo"></div>
+  </div>
+
+  <canvas id="geometric-canvas"></canvas>
+
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo-container" style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <svg class="shield-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 54px; height: 54px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.06)); animation: pulse-glow 4s infinite alternate ease-in-out;">
+          <defs>
+            <linearGradient id="metal-tl" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="100%" stop-color="#71717a"/>
+            </linearGradient>
+            <linearGradient id="metal-tr" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#e4e4e7"/>
+              <stop offset="100%" stop-color="#3f3f46"/>
+            </linearGradient>
+            <linearGradient id="metal-br" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#a1a1aa"/>
+              <stop offset="100%" stop-color="#18181b"/>
+            </linearGradient>
+            <linearGradient id="metal-bl" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#d4d4d8"/>
+              <stop offset="100%" stop-color="#27272a"/>
+            </linearGradient>
+          </defs>
+          
+          <!-- Facet 1 (Top-Left) -->
+          <polygon points="50,15 15,50 30,50 50,30" fill="url(#metal-tl)" />
+          
+          <!-- Facet 2 (Top-Right) -->
+          <polygon points="50,15 85,50 70,50 50,30" fill="url(#metal-tr)" />
+          
+          <!-- Facet 3 (Bottom-Right) -->
+          <polygon points="85,50 50,85 50,70 70,50" fill="url(#metal-br)" />
+          
+          <!-- Facet 4 (Bottom-Left) -->
+          <polygon points="15,50 35,70 42,62 30,50" fill="url(#metal-bl)" />
+        </svg>
+        <div class="logo-text" style="text-align: center;">
+          <h1 style="font-size: 1.62rem; font-weight: 800; letter-spacing: 1px; color: var(--text-primary); margin: 0; display: flex; align-items: center; justify-content: center; gap: 2px;">Black<span style="background: linear-gradient(135deg, #e4e4e7, #71717a); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Prism</span></h1>
+        </div>
+      </div>
+      <p class="subtitle">Suite Avanzada de Criptografía Post-Cuántica e Integridad Militar</p>
+    </header>
+
+    <nav class="app-nav">
+      <button class="nav-tab active" data-tab="tab-keys" id="nav-keys">
+        <span class="tab-icon">🔑</span>
+        <span class="tab-label">Gestión de Llaves</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-encrypt" id="nav-encrypt">
+        <span class="tab-icon">🔒</span>
+        <span class="tab-label">Cifrado Seguro</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-decrypt" id="nav-decrypt">
+        <span class="tab-icon">🔓</span>
+        <span class="tab-label">Descifrado</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-hash" id="nav-hash">
+        <span class="tab-icon">🔍</span>
+        <span class="tab-label">Hash & Verificación</span>
+      </button>
+    </nav>
+
+    <main class="app-main">
+
+      <!-- ════════════════════ PESTAÑA: GESTIÓN DE LLAVES ════════════════════ -->
+      <section id="tab-keys" class="tab-content active">
+        <div class="grid-layout">
+          <div class="card shadow-glow">
+            <h3 class="card-title"><span class="accent-purple">●</span> Generación de Identidad PQC</h3>
+            <p class="card-desc">Crea un par de llaves criptográficas post-cuánticas: <strong>ML-KEM-1024</strong> (KEM) y <strong>Dilithium-5</strong> (Firmas). Los secretos se borran de RAM automáticamente vía <strong>Zeroize</strong>.</p>
+            <div class="form-group">
+              <label for="key-pwd">Contraseña de Protección (Opcional)</label>
+              <input type="password" id="key-pwd" placeholder="Clave para encriptar la llave privada con Argon2id..." class="input-glow">
+              <small class="help-text">Si ingresas una contraseña, tu llave privada se guardará cifrada con ChaCha20-Poly1305 para evitar robo físico.</small>
+            </div>
+            <button id="btn-generate-keys" class="btn btn-primary btn-glow">
+              <span class="btn-text">⚡ Generar Nuevas Llaves PQC</span>
+              <span class="loader hidden"></span>
+            </button>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title"><span class="accent-cyan">●</span> Llaves Criptográficas Activas</h3>
+            <div class="key-output-container">
+              <div class="key-box">
+                <div class="key-header">
+                  <span>Clave Pública (ML-KEM-1024 + Dilithium-5)</span>
+                  <div class="key-actions">
+                    <button class="btn-icon" id="btn-copy-pub" title="Copiar al portapapeles">📋</button>
+                    <button class="btn-icon" id="btn-save-pub" title="Guardar como archivo">💾</button>
+                  </div>
+                </div>
+                <textarea id="pub-key-display" readonly placeholder="No hay ninguna llave pública activa en memoria..." class="textarea-key"></textarea>
+              </div>
+              <div class="key-box">
+                <div class="key-header">
+                  <span>Clave Privada (Protegida)</span>
+                  <div class="key-actions">
+                    <button class="btn-icon" id="btn-copy-priv" title="Copiar al portapapeles">📋</button>
+                    <button class="btn-icon" id="btn-save-priv" title="Guardar como archivo">💾</button>
+                  </div>
+                </div>
+                <textarea id="priv-key-display" readonly placeholder="No hay ninguna llave privada activa en memoria..." class="textarea-key"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shamir's Secret Sharing Card -->
+          <div class="card card-full shadow-glow">
+            <h3 class="card-title"><span class="accent-purple">●</span> División de Contraseñas (Shamir's Secret Sharing)</h3>
+            <p class="card-desc">Divide tu contraseña de doble factor en <strong>N partes</strong> (shares), requiriendo un umbral de <strong>M partes</strong> para recuperarla. Ideal para distribución segura de claves.</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <!-- Split Section -->
+              <div style="display: flex; flex-direction: column; gap: 12px; border-right: 1px solid rgba(255,255,255,0.08); padding-right: 16px;">
+                <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--accent-purple);">🗝️ Dividir Contraseña</h4>
+                <div class="form-group">
+                  <label for="shamir-split-pwd">Contraseña a Dividir</label>
+                  <input type="password" id="shamir-split-pwd" placeholder="Ingresa la contraseña..." class="input-glow">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                  <div class="form-group">
+                    <label for="shamir-total-shares">Partes Totales (N)</label>
+                    <input type="number" id="shamir-total-shares" value="5" min="2" max="255" class="input-glow">
+                  </div>
+                  <div class="form-group">
+                    <label for="shamir-threshold">Umbral Requerido (M)</label>
+                    <input type="number" id="shamir-threshold" value="3" min="2" max="255" class="input-glow">
+                  </div>
+                </div>
+                <button id="btn-shamir-split" class="btn btn-purple btn-glow">
+                  <span class="btn-text">🧩 Generar Fragmentos</span>
+                  <span class="loader hidden"></span>
+                </button>
+                <div class="form-group" style="margin-top: 5px;">
+                  <label>Fragmentos Generados (Hexadecimal)</label>
+                  <textarea id="shamir-shares-output" readonly placeholder="Los fragmentos hex aparecerán aquí (uno por línea)..." class="textarea-medium input-glow" style="font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; height: 100px;"></textarea>
+                </div>
+              </div>
+              
+              <!-- Recover Section -->
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--accent-cyan);">🧩 Reconstruir Contraseña</h4>
+                <div class="form-group">
+                  <label for="shamir-shares-input">Pegar Fragmentos (Uno por línea)</label>
+                  <textarea id="shamir-shares-input" placeholder="Pega al menos M fragmentos hexadecimales aquí..." class="textarea-medium input-glow" style="font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; height: 100px;"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="shamir-recover-threshold">Umbral Requerido (M)</label>
+                  <input type="number" id="shamir-recover-threshold" value="3" min="2" max="255" class="input-glow">
+                </div>
+                <button id="btn-shamir-recover" class="btn btn-cyan btn-glow">
+                  <span class="btn-text">🔑 Reconstruir Contraseña</span>
+                  <span class="loader hidden"></span>
+                </button>
+                <div class="form-group" style="margin-top: 5px;">
+                  <label for="shamir-recovered-pwd">Contraseña Recuperada</label>
+                  <div class="hash-output-wrapper">
+                    <input type="text" id="shamir-recovered-pwd" readonly placeholder="La contraseña aparecerá aquí..." class="input-glow" style="font-weight: 600; color: var(--accent-green);">
+                    <button class="hash-copy-btn" id="btn-copy-recovered-pwd" title="Copiar contraseña">📋</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════ PESTAÑA: CIFRADO ════════════════════ -->
+      <section id="tab-encrypt" class="tab-content">
+        <div class="grid-layout">
+          <div class="card">
+            <h3 class="card-title"><span class="accent-purple">●</span> Archivo a Cifrar</h3>
+            <div class="drop-zone" id="encrypt-drop-zone">
+              <div class="drop-icon">📂</div>
+              <div class="drop-text">Arrastra y suelta tu archivo aquí o ingresa la ruta</div>
+              <div class="drop-file-info hidden" id="encrypt-file-info">
+                <span class="file-name" id="enc-filename">archivo.dat</span>
+                <span class="file-size" id="enc-filesize">0 KB</span>
+              </div>
+            </div>
+            <div class="form-group" style="margin-top: 5px;">
+              <label for="encrypt-input-path">Ruta del Archivo Original</label>
+              <input type="text" id="encrypt-input-path" placeholder="/Users/tu-usuario/documento.pdf" class="input-glow">
+            </div>
+            <div class="form-group">
+              <label for="encrypt-pwd">Contraseña Adicional (Doble Factor)</label>
+              <input type="password" id="encrypt-pwd" placeholder="Contraseña secreta adicional..." class="input-glow">
+              <small class="help-text">Mezcla esta contraseña con Kyber usando Argon2id para un cifrado impenetrable.</small>
+            </div>
+            <!-- Hash de entrada/salida de cifrado -->
+            <div class="hash-results-panel">
+              <div class="hash-result-box">
+                <div class="hash-result-label">📥 Hash entrada (SHA3-256)</div>
+                <div class="hash-result-value empty" id="enc-input-hash" title="Haz clic para copiar">–</div>
+              </div>
+              <div class="hash-result-box">
+                <div class="hash-result-label">📤 Hash salida .qarq (SHA3-256)</div>
+                <div class="hash-result-value empty" id="enc-output-hash" title="Haz clic para copiar">–</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card shadow-glow">
+            <h3 class="card-title"><span class="accent-cyan">●</span> Blindaje y Seguridad Militar</h3>
+            <div class="form-group">
+              <label for="recipient-pubkey">Clave Pública del Receptor (Destinatario)</label>
+              <textarea id="recipient-pubkey" placeholder="Pega el JSON de la llave pública del destinatario aquí..." class="textarea-small input-glow"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="sender-privkey">Tu Clave Privada (Emisor - para Firma)</label>
+              <textarea id="sender-privkey" placeholder="Pega tu clave privada JSON para firmar digitalmente con Dilithium-5..." class="textarea-small input-glow"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="sender-key-pwd">Contraseña de tu Clave Privada (Si está protegida)</label>
+              <input type="password" id="sender-key-pwd" placeholder="Contraseña para desbloquear tu clave privada..." class="input-glow">
+            </div>
+            <div class="security-options-list">
+              <div class="toggle-option">
+                <div class="option-desc">
+                  <strong>🧹 Eliminación de Metadatos</strong>
+                  <span>Limpia EXIF, GPS, cámara y autor de imágenes.</span>
+                </div>
+                <label class="switch"><input type="checkbox" id="chk-metadata-clean" checked><span class="slider round"></span></label>
+              </div>
+              <div class="toggle-option">
+                <div class="option-desc">
+                  <strong>📏 Ofuscación Signal-style</strong>
+                  <span>Ruido exponencial variable + jitter OsRng. El tamaño real es imposible de deducir.</span>
+                </div>
+                <label class="switch"><input type="checkbox" id="chk-padding-obfuscation" checked><span class="slider round"></span></label>
+              </div>
+              <div class="toggle-option">
+                <div class="option-desc">
+                  <strong>🖥️ Pepper de Hardware (KDF)</strong>
+                  <span>Vincula el archivo a esta máquina física usando su identificador único de hardware.</span>
+                </div>
+                <label class="switch"><input type="checkbox" id="chk-hardware-pepper"><span class="slider round"></span></label>
+              </div>
+              <div class="toggle-option">
+                <div class="option-desc">
+                  <strong>🎭 Ofuscar Nombre de Salida</strong>
+                  <span>Renombra el archivo cifrado con 16 bytes hexadecimales aleatorios para máxima privacidad en disco.</span>
+                </div>
+                <label class="switch"><input type="checkbox" id="chk-obfuscate-filename"><span class="slider round"></span></label>
+              </div>
+              <div class="toggle-option col-span-2" style="flex-direction: column; align-items: stretch; gap: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                  <div class="option-desc">
+                    <strong>⏰ Tiempo de vida limitado (TTL)</strong>
+                    <span>El archivo se auto-destruirá (no se podrá descifrar) tras la fecha y hora configuradas.</span>
+                  </div>
+                  <label class="switch"><input type="checkbox" id="chk-ttl-enable"><span class="slider round"></span></label>
+                </div>
+                <div id="ttl-form-container" class="hidden" style="margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px; width: 100%;">
+                  <input type="datetime-local" id="enc-ttl-datetime" class="input-glow" style="width: auto;">
+                </div>
+              </div>
+              <div class="toggle-option col-span-2" style="flex-direction: column; align-items: stretch; gap: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                  <div class="option-desc">
+                    <strong>🎭 Modo Duress (Contraseña Señuelo)</strong>
+                    <span>Cifra un archivo señuelo alternativo. Si se introduce la contraseña señuelo al descifrar, se restaurará el señuelo.</span>
+                  </div>
+                  <label class="switch"><input type="checkbox" id="chk-duress-enable"><span class="slider round"></span></label>
+                </div>
+                <div id="duress-form-container" class="hidden" style="display: flex; flex-direction: column; gap: 8px; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px; width: 100%;">
+                  <div class="form-group">
+                    <label for="duress-file-path">Ruta del Archivo Señuelo (Decoy)</label>
+                    <input type="text" id="duress-file-path" placeholder="/Users/tu-usuario/decoy_document.pdf" class="input-glow">
+                  </div>
+                  <div class="form-group">
+                    <label for="duress-pwd">Contraseña Señuelo</label>
+                    <input type="password" id="duress-pwd" placeholder="Contraseña señuelo diferente a la principal..." class="input-glow">
+                  </div>
+                </div>
+              </div>
+              <div class="toggle-option col-span-2" style="flex-direction: column; align-items: stretch; gap: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                  <div class="option-desc">
+                    <strong>🧩 Fragmentación Reed-Solomon</strong>
+                    <span>Divide el archivo en fragmentos. Permite recuperar el original si se pierden fragmentos (ej: tolerancia a fallos).</span>
+                  </div>
+                  <label class="switch"><input type="checkbox" id="chk-fragmentation-enable"><span class="slider round"></span></label>
+                </div>
+                <div id="fragmentation-form-container" class="hidden" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px; width: 100%;">
+                  <div class="form-group">
+                    <label for="frag-data-shards">Fragmentos de Datos (D)</label>
+                    <input type="number" id="frag-data-shards" value="3" min="1" max="100" class="input-glow">
+                  </div>
+                  <div class="form-group">
+                    <label for="frag-parity-shards">Fragmentos de Paridad (P)</label>
+                    <input type="number" id="frag-parity-shards" value="2" min="1" max="100" class="input-glow">
+                  </div>
+                </div>
+              </div>
+              <div class="toggle-option col-span-2">
+                <div class="option-desc">
+                  <strong>💥 Destrucción Segura del Original (Shredder)</strong>
+                  <span>Sobrescribe el archivo original en disco antes de borrarlo permanentemente.</span>
+                </div>
+                <div class="select-wrapper">
+                  <select id="sel-shred-passes" class="select-glow">
+                    <option value="0">No borrar archivo original</option>
+                    <option value="1">1 pase (Sobrescritura rápida)</option>
+                    <option value="3" selected>3 pases (Estándar corporativo)</option>
+                    <option value="7">7 pases (Nivel Militar DoD)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <button id="btn-encrypt-file" class="btn btn-glow btn-purple" style="width: 100%;">
+              <span class="btn-text">🔐 Cifrar y Blindar Archivo (.qarq)</span>
+              <span class="loader hidden"></span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════ PESTAÑA: DESCIFRADO ════════════════════ -->
+      <section id="tab-decrypt" class="tab-content">
+        <div class="grid-layout">
+          <div class="card shadow-glow">
+            <h3 class="card-title"><span class="accent-purple">●</span> Archivo Blindado</h3>
+            <div class="drop-zone" id="decrypt-drop-zone">
+              <div class="drop-icon">🔒</div>
+              <div class="drop-text">Arrastra y suelta tu archivo .qarq aquí o ingresa la ruta</div>
+              <div class="drop-file-info hidden" id="decrypt-file-info">
+                <span class="file-name" id="dec-filename-info">archivo.qarq</span>
+                <span class="file-size" id="dec-filesize-info">0 KB</span>
+              </div>
+            </div>
+            <div class="form-group" style="margin-top: 5px;">
+              <label for="decrypt-input-path">Ruta del Archivo Cifrado (.qarq)</label>
+              <input type="text" id="decrypt-input-path" placeholder="/Users/tu-usuario/archivo.qarq" class="input-glow">
+            </div>
+            <div class="form-group">
+              <label for="decrypt-pwd">Contraseña de Doble Factor (Si aplica)</label>
+              <input type="password" id="decrypt-pwd" placeholder="Contraseña de descifrado..." class="input-glow">
+            </div>
+            <!-- Hash de salida de descifrado -->
+            <div class="hash-result-box">
+              <div class="hash-result-label">✅ Hash archivo restaurado (SHA3-256)</div>
+              <div class="hash-result-value empty" id="dec-output-hash" title="Haz clic para copiar">–</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title"><span class="accent-cyan">●</span> Autenticación y Desencapsulación</h3>
+            <div class="form-group">
+              <label for="recipient-privkey-dec">Tu Clave Privada (Receptor - para Desencapsular)</label>
+              <textarea id="recipient-privkey-dec" placeholder="Pega tu clave privada JSON para descifrar el secreto Kyber..." class="textarea-medium input-glow"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="recipient-privkey-dec-pwd">Contraseña de tu Clave Privada (Si está protegida)</label>
+              <input type="password" id="recipient-privkey-dec-pwd" placeholder="Contraseña para desbloquear tu clave privada..." class="input-glow">
+            </div>
+            <div class="form-group">
+              <label for="sender-pubkey-dec">Clave Pública del Remitente (para Verificar Firma)</label>
+              <textarea id="sender-pubkey-dec" placeholder="Pega la clave pública JSON del remitente para verificar su firma Dilithium-5..." class="textarea-medium input-glow"></textarea>
+            </div>
+            <button id="btn-decrypt-file" class="btn btn-glow btn-cyan" style="width: 100%;">
+              <span class="btn-text">🔓 Descifrar y Restaurar Archivo</span>
+              <span class="loader hidden"></span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════ PESTAÑA: HASH & VERIFICACIÓN ════════════════════ -->
+      <section id="tab-hash" class="tab-content">
+        <div class="grid-layout">
+
+          <!-- Calculadora de hash -->
+          <div class="card shadow-glow">
+            <h3 class="card-title"><span class="accent-green">●</span> Calculadora de Hash</h3>
+            <p class="card-desc">Calcula el hash criptográfico de cualquier archivo usando el algoritmo de tu preferencia. Ideal para verificar integridad antes y después del cifrado.</p>
+
+            <div class="drop-zone" id="hash-drop-zone">
+              <div class="drop-icon">🔍</div>
+              <div class="drop-text">Arrastra un archivo aquí o ingresa la ruta abajo</div>
+              <div class="drop-file-info hidden" id="hash-file-info">
+                <span class="file-name" id="hash-filename">archivo</span>
+                <span class="file-size" id="hash-filesize">Ruta detectada</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="hash-input-path">Ruta del Archivo</label>
+              <input type="text" id="hash-input-path" placeholder="/Users/tu-usuario/archivo.pdf" class="input-glow">
+            </div>
+
+            <div class="form-group">
+              <label>Algoritmo de Hash</label>
+              <div class="algo-grid">
+                <button class="algo-btn" data-algo="sha256">SHA-256</button>
+                <button class="algo-btn active" data-algo="sha3-256">SHA3-256</button>
+                <button class="algo-btn" data-algo="sha3-512">SHA3-512</button>
+                <button class="algo-btn" data-algo="sha512">SHA-512</button>
+                <button class="algo-btn" data-algo="blake3">BLAKE3</button>
+              </div>
+              <small class="help-text">SHA3-256 y BLAKE3 son los más modernos. SHA-256 es ampliamente compatible. BLAKE3 es el más rápido.</small>
+            </div>
+
+            <button id="btn-compute-hash" class="btn btn-glow btn-green" style="width: 100%;">
+              <span class="btn-text">🔍 Calcular Hash</span>
+              <span class="loader hidden"></span>
+            </button>
+          </div>
+
+          <!-- Resultado y comparador -->
+          <div class="card">
+            <h3 class="card-title"><span class="accent-cyan">●</span> Resultado y Comparador</h3>
+            <p class="card-desc">Verifica la integridad de un archivo comparando su hash con el valor esperado. Útil para validar descargas, backups o archivos cifrados.</p>
+
+            <div class="form-group">
+              <label>Hash Calculado</label>
+              <div class="hash-output-wrapper">
+                <textarea id="hash-result" readonly placeholder="El hash aparecerá aquí..." class="textarea-hash"></textarea>
+                <button class="hash-copy-btn" id="btn-copy-hash" title="Copiar hash">📋</button>
+              </div>
+              <small id="hash-algo-label" class="help-text" style="color: var(--accent-purple);">Algoritmo: SHA3-256 · 256 bits</small>
+            </div>
+
+            <div class="form-group">
+              <label for="hash-expected">Hash Esperado (para verificar)</label>
+              <div class="hash-output-wrapper">
+                <textarea id="hash-expected" placeholder="Pega aquí el hash esperado para comparar..." class="textarea-hash"></textarea>
+              </div>
+              <small class="help-text">Puedes pegar un hash de cualquier algoritmo para comparar. La comparación es automática.</small>
+            </div>
+
+            <!-- Indicador de coincidencia -->
+            <div class="hash-match-indicator idle" id="hash-match-indicator">
+              <span id="hash-match-icon">⚪</span>
+              <span id="hash-match-text">Ingresa un hash esperado para verificar la integridad del archivo</span>
+            </div>
+
+            <div class="form-group" style="margin-top: 4px;">
+              <label>Información del Algoritmo</label>
+              <div id="algo-info-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px;">
+                  <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 3px;">ALGORITMO</div>
+                  <div id="info-algo" style="font-size: 0.85rem; font-weight: 700; color: var(--accent-purple); font-family: 'Share Tech Mono', monospace;">SHA3-256</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px;">
+                  <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 3px;">LONGITUD</div>
+                  <div id="info-bits" style="font-size: 0.85rem; font-weight: 700; color: var(--accent-cyan); font-family: 'Share Tech Mono', monospace;">256 bits</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px;">
+                  <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 3px;">FAMILIA</div>
+                  <div id="info-family" style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary); font-family: 'Share Tech Mono', monospace;">NIST SHA-3</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px;">
+                  <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 3px;">ESTÁNDAR</div>
+                  <div id="info-standard" style="font-size: 0.85rem; font-weight: 700; color: var(--neon-green); font-family: 'Share Tech Mono', monospace;">FIPS 202</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="app-terminal">
+      <div class="terminal-header">
+        <span class="terminal-title">🖥️ Consola Cuántica de Operaciones</span>
+        <div class="terminal-badges">
+          <span class="zeroize-pill" id="zeroize-pill">🧹 RAM limpiada</span>
+          <button id="btn-clear-terminal" class="btn-clear">Limpiar</button>
+        </div>
+      </div>
+      <div class="terminal-body" id="terminal-output">
+        <div class="log-line text-green">[SISTEMA] BlackPrism v4.0 inicializado. Criptografía ML-KEM (FIPS 203) activa ✓</div>
+        <div class="log-line text-cyan">[SISTEMA] Kyber-1024 migrado a ML-KEM-1024. Dilithium-5 (Firma) y Zeroize (RAM) listos.</div>
+        <div class="log-line text-purple">[NUEVO v4.0] 7 Características Avanzadas de Seguridad listas (Pepper, TTL, Duress, Shamir, RS, Ofuscación).</div>
+        <div class="log-line text-yellow">[AVISO] Todas las operaciones se realizan 100% localmente y de forma offline.</div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+  // ============================================================
+  //   BlackPrism v4.0 — Controller
+  // ============================================================
+  (function() {
+    'use strict';
+
+    var terminal = document.getElementById('terminal-output');
+    var zeroizePill = document.getElementById('zeroize-pill');
+    var currentHashAlgo = 'sha3-256';
+
+    // ── Algoritmo info ───────────────────────────────────────
+    var algoMeta = {
+      'sha256':   { label: 'SHA-256',   bits: '256 bits', family: 'SHA-2',     standard: 'FIPS 180-4' },
+      'sha3-256': { label: 'SHA3-256',  bits: '256 bits', family: 'NIST SHA-3',standard: 'FIPS 202'   },
+      'sha3-512': { label: 'SHA3-512',  bits: '512 bits', family: 'NIST SHA-3',standard: 'FIPS 202'   },
+      'sha512':   { label: 'SHA-512',   bits: '512 bits', family: 'SHA-2',     standard: 'FIPS 180-4' },
+      'blake3':   { label: 'BLAKE3',    bits: '256 bits', family: 'BLAKE',     standard: 'RFC (IETF)'  }
+    };
+
+    // ── Utilidades ──────────────────────────────────────────
+    function log(color, message) {
+      var line = document.createElement('div');
+      line.className = 'log-line text-' + color;
+      var t = new Date().toLocaleTimeString();
+      line.textContent = '[' + t + '] ' + message;
+      terminal.appendChild(line);
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function showZeroizePill() {
+      zeroizePill.classList.add('show');
+      setTimeout(function() { zeroizePill.classList.remove('show'); }, 2800);
+    }
+
+    function copyText(text, label) {
+      navigator.clipboard.writeText(text).then(function() {
+        log('green', '[OK] ' + (label || 'Valor') + ' copiado al portapapeles.');
+      }).catch(function(e) { log('red', '[ERROR] Portapapeles: ' + e); });
+    }
+
+    function formatBytes(bytes, dec) {
+      dec = dec == null ? 2 : dec;
+      if (!bytes || bytes === 0) return '0 Bytes';
+      var k = 1024, sizes = ['Bytes','KB','MB','GB','TB'];
+      var i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dec)) + ' ' + sizes[i];
+    }
+
+    function setHashResult(hashValue) {
+      var el = document.getElementById('hash-result');
+      el.value = hashValue;
+      checkHashMatch();
+    }
+
+    function checkHashMatch() {
+      var result = document.getElementById('hash-result').value.trim().toLowerCase();
+      var expected = document.getElementById('hash-expected').value.trim().toLowerCase();
+      var indicator = document.getElementById('hash-match-indicator');
+      var icon = document.getElementById('hash-match-icon');
+      var text = document.getElementById('hash-match-text');
+
+      if (!expected || !result) {
+        indicator.className = 'hash-match-indicator idle';
+        icon.textContent = '⚪';
+        text.textContent = 'Ingresa un hash esperado para verificar la integridad del archivo';
+        return;
+      }
+
+      if (result === expected) {
+        indicator.className = 'hash-match-indicator match';
+        icon.textContent = '✅';
+        text.textContent = '¡Hashes coinciden! La integridad del archivo está verificada.';
+      } else {
+        indicator.className = 'hash-match-indicator mismatch';
+        icon.textContent = '❌';
+        text.textContent = 'Los hashes NO coinciden. El archivo puede haber sido alterado.';
+      }
+    }
+
+    function updateAlgoInfo(algo) {
+      var m = algoMeta[algo] || algoMeta['sha3-256'];
+      document.getElementById('info-algo').textContent = m.label;
+      document.getElementById('info-bits').textContent = m.bits;
+      document.getElementById('info-family').textContent = m.family;
+      document.getElementById('info-standard').textContent = m.standard;
+      document.getElementById('hash-algo-label').textContent = 'Algoritmo: ' + m.label + ' · ' + m.bits;
+    }
+
+    // ── Tauri invoke setup ───────────────────────────────────
+    var invoke = null;
+    var listen = null;
+
+    function waitForTauri(attempts, cb) {
+      attempts = attempts || 0;
+      var t = window.__TAURI__;
+      if (t) {
+        try {
+          if (t.core && typeof t.core.invoke === 'function') { invoke = t.core.invoke.bind(t.core); }
+          else if (typeof t.invoke === 'function') { invoke = t.invoke.bind(t); }
+          if (t.event && typeof t.event.listen === 'function') { listen = t.event.listen.bind(t.event); }
+          else if (typeof t.listen === 'function') { listen = t.listen.bind(t); }
+        } catch(e) { log('red', '[ERROR] Al inicializar API Tauri: ' + e); }
+      }
+
+      if (invoke) {
+        log('green', '[INICIO] Conexión nativa con Tauri establecida ✓');
+        cb();
+      } else if (attempts < 30) {
+        setTimeout(function() { waitForTauri(attempts + 1, cb); }, 100);
+      } else {
+        log('red', '[ERROR] API de Tauri no disponible. Ejecuta como binario nativo.');
+        log('yellow', '[INFO] Funcionalidad limitada — solo interfaz visual activa.');
+        cb();
+      }
+    }
+
+    // ── Tabs / Navegación ────────────────────────────────────
+    function setupTabs() {
+      var tabs = document.querySelectorAll('.nav-tab');
+      var sections = document.querySelectorAll('.tab-content');
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          var target = tab.getAttribute('data-tab');
+          tabs.forEach(function(t) { t.classList.remove('active'); });
+          sections.forEach(function(s) { s.classList.remove('active'); });
+          tab.classList.add('active');
+          var sec = document.getElementById(target);
+          if (sec) sec.classList.add('active');
+          var label = tab.querySelector('.tab-label');
+          log('cyan', '[VISTA] → ' + (label ? label.textContent : target));
+        });
+      });
+    }
+
+    // ── Terminal clear ────────────────────────────────────────
+    function setupClearBtn() {
+      var btn = document.getElementById('btn-clear-terminal');
+      if (btn) btn.addEventListener('click', function() {
+        terminal.innerHTML = '';
+        log('green', '[SISTEMA] Consola reiniciada.');
+      });
+    }
+
+    // ── Drag & Drop ──────────────────────────────────────────
+    function setupDropZone(zoneId, pathInputId, infoId, nameId, sizeId) {
+      var zone = document.getElementById(zoneId);
+      var info = document.getElementById(infoId);
+      if (!zone) return;
+      zone.addEventListener('dragover', function(e) { e.preventDefault(); zone.classList.add('dragover'); });
+      zone.addEventListener('dragleave', function() { zone.classList.remove('dragover'); });
+      zone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+        var files = e.dataTransfer.files;
+        if (files && files.length > 0) {
+          var f = files[0];
+          log('yellow', '[DRAG] Archivo: ' + f.name + ' (' + formatBytes(f.size) + ')');
+          document.getElementById(nameId).textContent = f.name;
+          document.getElementById(sizeId).textContent = formatBytes(f.size);
+          info.classList.remove('hidden');
+        }
+      });
+    }
+
+    function setupDropZones() {
+      setupDropZone('encrypt-drop-zone', 'encrypt-input-path', 'encrypt-file-info', 'enc-filename', 'enc-filesize');
+      setupDropZone('decrypt-drop-zone', 'decrypt-input-path', 'decrypt-file-info', 'dec-filename-info', 'dec-filesize-info');
+      setupDropZone('hash-drop-zone', 'hash-input-path', 'hash-file-info', 'hash-filename', 'hash-filesize');
+
+      if (listen) {
+        listen('tauri://drag-drop', function(event) {
+          var paths = (event.payload && Array.isArray(event.payload.paths)) ? event.payload.paths : (Array.isArray(event.payload) ? event.payload : []);
+          if (paths.length > 0) {
+            var p = paths[0];
+            var name = p.split('/').pop() || p;
+            var activeTab = (document.querySelector('.nav-tab.active') || {}).getAttribute('data-tab');
+            log('green', '[DRAG-DROP] Archivo nativo: ' + p);
+            if (activeTab === 'tab-encrypt') {
+              document.getElementById('encrypt-input-path').value = p;
+              document.getElementById('enc-filename').textContent = name;
+              document.getElementById('enc-filesize').textContent = 'Ruta detectada';
+              document.getElementById('encrypt-file-info').classList.remove('hidden');
+            } else if (activeTab === 'tab-decrypt') {
+              document.getElementById('decrypt-input-path').value = p;
+              document.getElementById('dec-filename-info').textContent = name;
+              document.getElementById('dec-filesize-info').textContent = 'Ruta detectada';
+              document.getElementById('decrypt-file-info').classList.remove('hidden');
+            } else if (activeTab === 'tab-hash') {
+              document.getElementById('hash-input-path').value = p;
+              document.getElementById('hash-filename').textContent = name;
+              document.getElementById('hash-filesize').textContent = 'Ruta detectada';
+              document.getElementById('hash-file-info').classList.remove('hidden');
+            }
+          }
+        }).catch(function() {});
+      }
+    }
+
+    // ── Clipboard helpers ─────────────────────────────────────
+    function setupClipboard(btnId, textareaId, keyName) {
+      var btn = document.getElementById(btnId);
+      var ta = document.getElementById(textareaId);
+      if (!btn || !ta) return;
+      btn.addEventListener('click', function() {
+        if (!ta.value) { log('yellow', '[AVISO] No hay ' + keyName + ' para copiar.'); return; }
+        copyText(ta.value, keyName);
+        btn.textContent = '✅';
+        setTimeout(function() { btn.textContent = '📋'; }, 1500);
+      });
+    }
+
+    function setupDownload(btnId, textareaId, filename) {
+      var btn = document.getElementById(btnId);
+      var ta = document.getElementById(textareaId);
+      if (!btn || !ta) return;
+      btn.addEventListener('click', function() {
+        if (!ta.value) { log('yellow', '[AVISO] No hay contenido para descargar.'); return; }
+        var a = document.createElement('a');
+        a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(ta.value);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        log('green', '[OK] Archivo guardado: ' + filename);
+      });
+    }
+
+    // ── Hash click-to-copy on result boxes ───────────────────
+    function setupHashResultCopy() {
+      ['enc-input-hash', 'enc-output-hash', 'dec-output-hash'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('click', function() {
+          if (el.textContent && el.textContent !== '–') {
+            copyText(el.textContent, 'Hash');
+          }
+        });
+      });
+    }
+
+    // ── Generar Llaves ────────────────────────────────────────
+    function setupGenerateKeys() {
+      var btn = document.getElementById('btn-generate-keys');
+      if (!btn) return;
+      btn.addEventListener('click', function() {
+        if (!invoke) { log('red', '[ERROR] Tauri no disponible. La app debe ejecutarse como binario nativo.'); return; }
+        var pwd = document.getElementById('key-pwd').value;
+        var loader = btn.querySelector('.loader');
+        var btnText = btn.querySelector('.btn-text');
+        loader.classList.remove('hidden'); btnText.textContent = 'Generando...'; btn.disabled = true;
+        log('cyan', '[PROCESO] Generando par Kyber-1024 + Dilithium-5 con OsRng...');
+
+        invoke('generate_keys').then(function(keys) {
+          var pubKeyJson = keys[0];
+          var privKeyJson = keys[1];
+          log('green', '[OK] Par de llaves cuánticas generado exitosamente.');
+          log('cyan', '[CRYPTO] Kyber-1024 KEM + Dilithium-5 DSA activos.');
+          document.getElementById('pub-key-display').value = pubKeyJson;
+
+          if (pwd && pwd.trim().length > 0) {
+            log('cyan', '[PROCESO] Cifrando clave privada con Argon2id + ChaCha20-Poly1305...');
+            invoke('protect_key', { privateKeyJson: privKeyJson, password: pwd }).then(function(hexProtected) {
+              var protectedObj = {
+                protected_data_hex: hexProtected,
+                argon2id_salt_size: 32,
+                chacha20_nonce_size: 12,
+                is_protected: true,
+                algorithm: 'Argon2id-ChaCha20Poly1305'
+              };
+              document.getElementById('priv-key-display').value = JSON.stringify(protectedObj, null, 2);
+              log('green', '[OK] Clave privada protegida con contraseña.');
+              log('purple', '[RAM] Secretos criptográficos borrados de memoria (Zeroize) ✓');
+              showZeroizePill();
+            }).catch(function(e) {
+              log('red', '[ERROR] Al proteger la clave: ' + e);
+              document.getElementById('priv-key-display').value = privKeyJson;
+            }).finally(function() {
+              loader.classList.add('hidden'); btnText.textContent = '⚡ Generar Nuevas Llaves PQC'; btn.disabled = false;
+            });
+          } else {
+            document.getElementById('priv-key-display').value = privKeyJson;
+            log('yellow', '[AVISO] Clave privada en texto plano (sin contraseña de protección).');
+            log('purple', '[RAM] Secretos criptográficos borrados de memoria (Zeroize) ✓');
+            showZeroizePill();
+            loader.classList.add('hidden'); btnText.textContent = '⚡ Generar Nuevas Llaves PQC'; btn.disabled = false;
+          }
+        }).catch(function(e) {
+          log('red', '[ERROR] Al generar llaves: ' + e);
+          loader.classList.add('hidden'); btnText.textContent = '⚡ Generar Nuevas Llaves PQC'; btn.disabled = false;
+        });
+      });
+    }
+
+    // ── Toggles de Formularios (v4.0) ─────────────────────────
+    function setupFormToggles() {
+      var ttlChk = document.getElementById('chk-ttl-enable');
+      var ttlForm = document.getElementById('ttl-form-container');
+      if (ttlChk && ttlForm) {
+        ttlChk.addEventListener('change', function() {
+          if (ttlChk.checked) ttlForm.classList.remove('hidden');
+          else ttlForm.classList.add('hidden');
+        });
+      }
+
+      var duressChk = document.getElementById('chk-duress-enable');
+      var duressForm = document.getElementById('duress-form-container');
+      if (duressChk && duressForm) {
+        duressChk.addEventListener('change', function() {
+          if (duressChk.checked) duressForm.classList.remove('hidden');
+          else duressForm.classList.add('hidden');
+        });
+      }
+
+      var fragChk = document.getElementById('chk-fragmentation-enable');
+      var fragForm = document.getElementById('fragmentation-form-container');
+      if (fragChk && fragForm) {
+        fragChk.addEventListener('change', function() {
+          if (fragChk.checked) fragForm.classList.remove('hidden');
+          else fragForm.classList.add('hidden');
+        });
+      }
+    }
+
+    // ── Shamir Secret Sharing Control (v4.0) ───────────────────
+    function setupShamir() {
+      // Split
+      var btnSplit = document.getElementById('btn-shamir-split');
+      if (btnSplit) {
+        btnSplit.addEventListener('click', function() {
+          if (!invoke) { log('red', '[ERROR] Tauri no disponible.'); return; }
+          var pwd = document.getElementById('shamir-split-pwd').value;
+          var total = parseInt(document.getElementById('shamir-total-shares').value) || 0;
+          var threshold = parseInt(document.getElementById('shamir-threshold').value) || 0;
+
+          if (!pwd) { log('red', '[ERROR] Ingresa una contraseña para dividir.'); return; }
+          if (total < 2 || threshold < 2) { log('red', '[ERROR] Partes y umbral deben ser al menos 2.'); return; }
+          if (threshold > total) { log('red', '[ERROR] El umbral no puede ser mayor que las partes totales.'); return; }
+
+          var loader = btnSplit.querySelector('.loader');
+          var btnText = btnSplit.querySelector('.btn-text');
+          loader.classList.remove('hidden'); btnText.textContent = 'Dividiendo...'; btnSplit.disabled = true;
+
+          log('cyan', '[SHAMIR] Dividiendo secreto con umbral M=' + threshold + ', N=' + total + '...');
+          
+          invoke('split_password', { password: pwd, threshold: threshold, total: total }).then(function(shares) {
+            document.getElementById('shamir-shares-output').value = shares.join('\n');
+            log('green', '[OK] Secreto dividido exitosamente en ' + shares.length + ' partes.');
+          }).catch(function(e) {
+            log('red', '[ERROR] Shamir split fallido: ' + e);
+          }).finally(function() {
+            loader.classList.add('hidden'); btnText.textContent = '🧩 Generar Fragmentos'; btnSplit.disabled = false;
+          });
+        });
+      }
+
+      // Recover
+      var btnRecover = document.getElementById('btn-shamir-recover');
+      if (btnRecover) {
+        btnRecover.addEventListener('click', function() {
+          if (!invoke) { log('red', '[ERROR] Tauri no disponible.'); return; }
+          var sharesText = document.getElementById('shamir-shares-input').value.trim();
+          var threshold = parseInt(document.getElementById('shamir-recover-threshold').value) || 0;
+
+          if (!sharesText) { log('red', '[ERROR] Pega los fragmentos para reconstruir.'); return; }
+          var shares = sharesText.split('\n').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
+          
+          if (shares.length < threshold) {
+            log('red', '[ERROR] Se proporcionaron ' + shares.length + ' fragmentos, pero se requiere un umbral de ' + threshold + '.');
+            return;
+          }
+
+          var loader = btnRecover.querySelector('.loader');
+          var btnText = btnRecover.querySelector('.btn-text');
+          loader.classList.remove('hidden'); btnText.textContent = 'Reconstruyendo...'; btnRecover.disabled = true;
+
+          log('cyan', '[SHAMIR] Intentando recuperar secreto con ' + shares.length + ' fragmentos...');
+
+          invoke('recover_password', { shares: shares, threshold: threshold }).then(function(recoveredPwd) {
+            document.getElementById('shamir-recovered-pwd').value = recoveredPwd;
+            log('green', '[OK] Contraseña reconstruida exitosamente.');
+          }).catch(function(e) {
+            log('red', '[ERROR] Shamir recover fallido: ' + e);
+          }).finally(function() {
+            loader.classList.add('hidden'); btnText.textContent = '🔑 Reconstruir Contraseña'; btnRecover.disabled = false;
+          });
+        });
+      }
+
+      // Copy recovered password
+      var btnCopyRecovered = document.getElementById('btn-copy-recovered-pwd');
+      if (btnCopyRecovered) {
+        btnCopyRecovered.addEventListener('click', function() {
+          var val = document.getElementById('shamir-recovered-pwd').value;
+          if (!val) { log('yellow', '[AVISO] No hay contraseña recuperada para copiar.'); return; }
+          copyText(val, 'Contraseña recuperada');
+          btnCopyRecovered.textContent = '✅';
+          setTimeout(function() { btnCopyRecovered.textContent = '📋'; }, 1500);
+        });
+      }
+    }
+
+    // ── Cifrar Archivo ────────────────────────────────────────
+    function setupEncrypt() {
+      var btn = document.getElementById('btn-encrypt-file');
+      if (!btn) return;
+      btn.addEventListener('click', function() {
+        if (!invoke) { log('red', '[ERROR] Tauri no disponible.'); return; }
+
+        var inputPath = document.getElementById('encrypt-input-path').value.trim();
+        var pubKey = document.getElementById('recipient-pubkey').value.trim();
+        var privKey = document.getElementById('sender-privkey').value.trim();
+        var senderKeyPwd = document.getElementById('sender-key-pwd').value;
+        var doubleFactorPwd = document.getElementById('encrypt-pwd').value;
+        var cleanMetadata = document.getElementById('chk-metadata-clean').checked;
+        var shredPasses = parseInt(document.getElementById('sel-shred-passes').value);
+
+        if (!inputPath) { log('red', '[ERROR] Especifica la ruta del archivo a cifrar.'); return; }
+        if (!pubKey) { log('red', '[ERROR] Se requiere la clave pública del receptor.'); return; }
+        if (!privKey) { log('red', '[ERROR] Se requiere tu clave privada (emisor) para firmar.'); return; }
+
+        var loader = btn.querySelector('.loader');
+        var btnText = btn.querySelector('.btn-text');
+        loader.classList.remove('hidden'); btnText.textContent = 'Cifrando...'; btn.disabled = true;
+
+        // Reset hash display
+        ['enc-input-hash', 'enc-output-hash'].forEach(function(id) {
+          var el = document.getElementById(id);
+          el.textContent = '–'; el.classList.add('empty');
+        });
+
+        log('cyan', '[PROCESO] Iniciando cifrado: ' + inputPath);
+
+        var doEncrypt = function(senderPrivKeyFinal) {
+          var usePepper = document.getElementById('chk-hardware-pepper').checked;
+          var obfuscateName = document.getElementById('chk-obfuscate-filename').checked;
+          
+          var ttlSeconds = null;
+          if (document.getElementById('chk-ttl-enable').checked) {
+            var val = document.getElementById('enc-ttl-datetime').value;
+            if (val) {
+              ttlSeconds = Math.floor(new Date(val).getTime() / 1000);
+            }
+          }
+
+          var decoyPath = null;
+          var decoyPwd = null;
+          if (document.getElementById('chk-duress-enable').checked) {
+            decoyPath = document.getElementById('duress-file-path').value.trim() || null;
+            decoyPwd = document.getElementById('duress-pwd').value || null;
+            if (!decoyPath) {
+              log('red', '[ERROR] Modo Duress activo, especifica la ruta del archivo señuelo.');
+              loader.classList.add('hidden'); btnText.textContent = '🔐 Cifrar y Blindar Archivo (.qarq)'; btn.disabled = false;
+              return;
+            }
+          }
+
+          var dataShards = null;
+          var parityShards = null;
+          if (document.getElementById('chk-fragmentation-enable').checked) {
+            dataShards = parseInt(document.getElementById('frag-data-shards').value) || null;
+            parityShards = parseInt(document.getElementById('frag-parity-shards').value) || null;
+          }
+
+          log('cyan', '[CRYPTO] ML-KEM-1024 + Forward Secrecy + Dilithium-5 + Signal Padding...');
+
+          invoke('encrypt_file', {
+            inputPath: inputPath,
+            publicKeyJson: pubKey,
+            senderPrivateKeyJson: senderPrivKeyFinal,
+            password: doubleFactorPwd || null,
+            deleteOriginal: shredPasses > 0,
+            shredPasses: shredPasses,
+            metadataClean: cleanMetadata,
+            // v4.0 features
+            hardwarePepper: usePepper,
+            ttlSeconds: ttlSeconds,
+            decoyFilePath: decoyPath,
+            decoyPassword: decoyPwd,
+            obfuscateFilename: obfuscateName,
+            dataShards: dataShards,
+            parityShards: parityShards
+          }).then(function(result) {
+            log('green', '[ÉXITO] Archivo cifrado: ' + result.output_path);
+            log('cyan', '[HASH-IN]  SHA3-256 entrada: ' + result.input_hash.substring(0, 32) + '...');
+            log('cyan', '[HASH-OUT] SHA3-256 .qarq:   ' + result.output_hash.substring(0, 32) + '...');
+            log('purple', '[RAM] Secretos criptográficos borrados de memoria (Zeroize) ✓');
+            log('purple', '[PAD] Ofuscación Signal-style aplicada. Tamaño real oculto.');
+            if (shredPasses > 0) log('green', '[SHRED] Original destruido de forma segura.');
+            showZeroizePill();
+
+            // Update hash display
+            var inEl = document.getElementById('enc-input-hash');
+            inEl.textContent = result.input_hash; inEl.classList.remove('empty');
+            var outEl = document.getElementById('enc-output-hash');
+            outEl.textContent = result.output_hash; outEl.classList.remove('empty');
+          }).catch(function(e) {
+            log('red', '[ERROR] Cifrado fallido: ' + e);
+          }).finally(function() {
+            loader.classList.add('hidden'); btnText.textContent = '🔐 Cifrar y Blindar Archivo (.qarq)'; btn.disabled = false;
+          });
+        };
+
+        if (privKey.includes('protected_data_hex')) {
+          if (!senderKeyPwd) { log('red', '[ERROR] Tu clave privada está protegida. Ingresa la contraseña.'); loader.classList.add('hidden'); btnText.textContent = '🔐 Cifrar y Blindar Archivo (.qarq)'; btn.disabled = false; return; }
+          var keyObj = JSON.parse(privKey);
+          invoke('unprotect_key', { protectedKeyHex: keyObj.protected_data_hex, password: senderKeyPwd }).then(function(dk) {
+            log('green', '[OK] Clave privada desbloqueada.'); doEncrypt(dk);
+          }).catch(function(e) { log('red', '[ERROR] Al desbloquear clave: ' + e); loader.classList.add('hidden'); btnText.textContent = '🔐 Cifrar y Blindar Archivo (.qarq)'; btn.disabled = false; });
+        } else {
+          doEncrypt(privKey);
+        }
+      });
+    }
+
+    // ── Descifrar Archivo ─────────────────────────────────────
+    function setupDecrypt() {
+      var btn = document.getElementById('btn-decrypt-file');
+      if (!btn) return;
+      btn.addEventListener('click', function() {
+        if (!invoke) { log('red', '[ERROR] Tauri no disponible.'); return; }
+
+        var inputPath = document.getElementById('decrypt-input-path').value.trim();
+        var recipientPrivKey = document.getElementById('recipient-privkey-dec').value.trim();
+        var recipientPrivKeyPwd = document.getElementById('recipient-privkey-dec-pwd').value;
+        var senderPubKey = document.getElementById('sender-pubkey-dec').value.trim();
+        var doubleFactorPwd = document.getElementById('decrypt-pwd').value;
+
+        if (!inputPath) { log('red', '[ERROR] Especifica la ruta del archivo .qarq.'); return; }
+        if (!recipientPrivKey) { log('red', '[ERROR] Se requiere tu clave privada para descifrar.'); return; }
+        if (!senderPubKey) { log('red', '[ERROR] Se requiere la clave pública del remitente para verificar.'); return; }
+
+        var loader = btn.querySelector('.loader');
+        var btnText = btn.querySelector('.btn-text');
+        loader.classList.remove('hidden'); btnText.textContent = 'Descifrando...'; btn.disabled = true;
+
+        var hashEl = document.getElementById('dec-output-hash');
+        hashEl.textContent = '–'; hashEl.classList.add('empty');
+
+        log('cyan', '[PROCESO] Descifrado: ' + inputPath);
+
+        var doDecrypt = function(privKeyFinal) {
+          invoke('decrypt_file', {
+            inputPath: inputPath,
+            recipientPrivateKeyJson: privKeyFinal,
+            senderPublicKeyJson: senderPubKey,
+            password: doubleFactorPwd || null
+          }).then(function(result) {
+            log('green', '[ÉXITO] Firma Dilithium-5 verificada ✓');
+            log('green', '[ÉXITO] Archivo restaurado: ' + result.output_path);
+            log('cyan', '[HASH] SHA3-256 archivo restaurado: ' + result.output_hash.substring(0, 32) + '...');
+            log('purple', '[RAM] Secretos criptográficos borrados de memoria (Zeroize) ✓');
+            showZeroizePill();
+
+            hashEl.textContent = result.output_hash; hashEl.classList.remove('empty');
+          }).catch(function(e) {
+            log('red', '[ERROR] Descifrado fallido: ' + e);
+          }).finally(function() {
+            loader.classList.add('hidden'); btnText.textContent = '🔓 Descifrar y Restaurar Archivo'; btn.disabled = false;
+          });
+        };
+
+        if (recipientPrivKey.includes('protected_data_hex')) {
+          if (!recipientPrivKeyPwd) { log('red', '[ERROR] Tu clave privada está protegida. Ingresa la contraseña.'); loader.classList.add('hidden'); btnText.textContent = '🔓 Descifrar y Restaurar Archivo'; btn.disabled = false; return; }
+          var keyObj = JSON.parse(recipientPrivKey);
+          invoke('unprotect_key', { protectedKeyHex: keyObj.protected_data_hex, password: recipientPrivKeyPwd }).then(function(dk) { doDecrypt(dk); })
+          .catch(function(e) { log('red', '[ERROR] Al desbloquear clave: ' + e); loader.classList.add('hidden'); btnText.textContent = '🔓 Descifrar y Restaurar Archivo'; btn.disabled = false; });
+        } else {
+          doDecrypt(recipientPrivKey);
+        }
+      });
+    }
+
+    // ── Hash & Verificación ───────────────────────────────────
+    function setupHashTab() {
+      // Selector de algoritmo
+      var algoBtns = document.querySelectorAll('.algo-btn');
+      algoBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          algoBtns.forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          currentHashAlgo = btn.getAttribute('data-algo');
+          updateAlgoInfo(currentHashAlgo);
+          log('cyan', '[HASH] Algoritmo seleccionado: ' + currentHashAlgo.toUpperCase());
+          // Re-check match if there's already a result
+          checkHashMatch();
+        });
+      });
+
+      // Watcher en campo hash-expected
+      document.getElementById('hash-expected').addEventListener('input', checkHashMatch);
+
+      // Botón calcular hash
+      var btn = document.getElementById('btn-compute-hash');
+      if (!btn) return;
+      btn.addEventListener('click', function() {
+        if (!invoke) { log('red', '[ERROR] Tauri no disponible.'); return; }
+        var filePath = document.getElementById('hash-input-path').value.trim();
+        if (!filePath) { log('red', '[ERROR] Especifica la ruta del archivo.'); return; }
+
+        var loader = btn.querySelector('.loader');
+        var btnText = btn.querySelector('.btn-text');
+        loader.classList.remove('hidden'); btnText.textContent = 'Calculando...'; btn.disabled = true;
+
+        document.getElementById('hash-result').value = '';
+        checkHashMatch();
+
+        log('cyan', '[HASH] Calculando ' + currentHashAlgo.toUpperCase() + ' de: ' + filePath);
+
+        invoke('compute_hash', { filePath: filePath, algorithm: currentHashAlgo }).then(function(hash) {
+          setHashResult(hash);
+          log('green', '[HASH] ' + currentHashAlgo.toUpperCase() + ': ' + hash.substring(0, 32) + '...');
+          log('green', '[HASH] Cálculo completado. Hex completo en el panel.');
+        }).catch(function(e) {
+          log('red', '[ERROR] Error al calcular hash: ' + e);
+        }).finally(function() {
+          loader.classList.add('hidden'); btnText.textContent = '🔍 Calcular Hash'; btn.disabled = false;
+        });
+      });
+
+      // Botón copiar hash
+      var copyBtn = document.getElementById('btn-copy-hash');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', function() {
+          var val = document.getElementById('hash-result').value;
+          if (!val) { log('yellow', '[AVISO] No hay hash para copiar.'); return; }
+          copyText(val, 'Hash ' + currentHashAlgo.toUpperCase());
+          copyBtn.textContent = '✅';
+          setTimeout(function() { copyBtn.textContent = '📋'; }, 1500);
+        });
+      }
+
+      updateAlgoInfo(currentHashAlgo);
+    }
+
+    // ── Optimized Geometric Background Constellation Drawer ──
+    function setupGeometricBackground() {
+      var canvas = document.getElementById('geometric-canvas');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      var particles = [];
+      var maxParticles = 60;
+      var mouse = { x: null, y: null, radius: 150 };
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      window.addEventListener('mousemove', function(e) {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      });
+
+      window.addEventListener('mouseleave', function() {
+        mouse.x = null;
+        mouse.y = null;
+      });
+
+      function Particle() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.4;
+        this.vy = (Math.random() - 0.5) * 0.4;
+        this.size = Math.random() * 1.5 + 1;
+      }
+
+      Particle.prototype.update = function() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < 0 || this.x > canvas.width) this.vx = -this.vx;
+        if (this.y < 0 || this.y > canvas.height) this.vy = -this.vy;
+
+        if (mouse.x !== null && mouse.y !== null) {
+          var dx = mouse.x - this.x;
+          var dy = mouse.y - this.y;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < mouse.radius) {
+            var force = (mouse.radius - dist) / mouse.radius;
+            this.x -= dx * force * 0.02;
+            this.y -= dy * force * 0.02;
+          }
+        }
+      };
+
+      Particle.prototype.draw = function() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(139, 92, 246, 0.4)';
+        ctx.fill();
+      };
+
+      for (var i = 0; i < maxParticles; i++) {
+        particles.push(new Particle());
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (var i = 0; i < particles.length; i++) {
+          var p1 = particles[i];
+          p1.update();
+          p1.draw();
+
+          for (var j = i + 1; j < particles.length; j++) {
+            var p2 = particles[j];
+            var dx = p1.x - p2.x;
+            var dy = p1.y - p2.y;
+            var dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 100) {
+              var alpha = (100 - dist) / 100 * 0.12;
+              ctx.beginPath();
+              ctx.moveTo(p1.x, p1.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.strokeStyle = 'rgba(6, 182, 212, ' + alpha + ')';
+              ctx.lineWidth = 0.8;
+              ctx.stroke();
+            }
+          }
+
+          if (mouse.x !== null && mouse.y !== null) {
+            var mdx = p1.x - mouse.x;
+            var mdy = p1.y - mouse.y;
+            var mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+            if (mdist < mouse.radius) {
+              var malpha = (mouse.radius - mdist) / mouse.radius * 0.15;
+              ctx.beginPath();
+              ctx.moveTo(p1.x, p1.y);
+              ctx.lineTo(mouse.x, mouse.y);
+              ctx.strokeStyle = 'rgba(139, 92, 246, ' + malpha + ')';
+              ctx.lineWidth = 0.8;
+              ctx.stroke();
+            }
+          }
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    }
+
+    // ── Init ─────────────────────────────────────────────────
+    setupGeometricBackground();
+    setupTabs();
+    setupClearBtn();
+
+    waitForTauri(0, function() {
+      setupDropZones();
+      setupFormToggles();
+      setupShamir();
+      setupClipboard('btn-copy-pub', 'pub-key-display', 'Clave pública');
+      setupClipboard('btn-copy-priv', 'priv-key-display', 'Clave privada');
+      setupDownload('btn-save-pub', 'pub-key-display', 'blackprism_identity.pub');
+      setupDownload('btn-save-priv', 'priv-key-display', 'blackprism_identity.key');
+      setupHashResultCopy();
+      setupGenerateKeys();
+      setupEncrypt();
+      setupDecrypt();
+      setupHashTab();
+    });
+
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+{
+  "productName": "BlackPrism",
+  "version": "4.0.0",
+  "identifier": "com.blackprism.app",
+  "build": {
+    "frontendDist": "./ui"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "BlackPrism v4.0 - Post-Quantum Cryptography Suite",
+        "width": 1080,
+        "height": 780,
+        "minWidth": 780,
+        "minHeight": 600,
+        "resizable": true,
+        "transparent": false,
+        "decorations": true
+      }
+    ],
+    "security": {
+      "csp": null,
+      "capabilities": [
+        {
+          "identifier": "main-capability",
+          "description": "Permitir comandos PQC e IPC para la ventana principal",
+          "windows": ["main"],
+          "permissions": [
+            "core:default",
+            "core:event:default",
+            "core:window:default",
+            "allow-generate-keys",
+            "allow-protect-key",
+            "allow-unprotect-key",
+            "allow-encrypt-file",
+            "allow-decrypt-file",
+            "allow-compute-hash"
+          ]
+        }
+      ]
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/64x64.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}
